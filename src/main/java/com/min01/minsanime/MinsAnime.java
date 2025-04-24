@@ -1,0 +1,28 @@
+package com.min01.minsanime;
+
+import com.min01.minsanime.entity.AnimeEntities;
+import com.min01.minsanime.item.AnimeItems;
+import com.min01.minsanime.misc.AnimeEntityDataSerializers;
+import com.min01.minsanime.network.AnimeNetwork;
+import com.min01.minsanime.particle.AnimeParticles;
+
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+
+@Mod(MinsAnime.MODID)
+public class MinsAnime 
+{
+	public static final String MODID = "minsanime";
+	
+	public MinsAnime() 
+	{
+		IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+		AnimeEntities.ENTITY_TYPES.register(bus);
+		AnimeItems.ITEMS.register(bus);
+		AnimeEntityDataSerializers.SERIALIZERS.register(bus);
+		AnimeParticles.PARTICLES.register(bus);
+		
+		AnimeNetwork.registerMessages();
+	}
+}

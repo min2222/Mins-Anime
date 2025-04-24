@@ -1,0 +1,19 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "com.min01.minsanime.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"MixinLevel",
+		"MixinProjectileUtil",
+		"MixinLivingEntity"
+	],
+	"client": [
+	],
+	"server": [
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"refmap": "minsanime.refmap.json"
+}
