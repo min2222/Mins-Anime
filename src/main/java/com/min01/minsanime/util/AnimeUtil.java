@@ -4,6 +4,9 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import com.min01.minsanime.capabilities.AnimeCapabilities;
+import com.min01.minsanime.capabilities.IOwnerCapability;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +21,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -46,6 +50,31 @@ public class AnimeUtil
 			return BlockHitResult.miss(p_275153_.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(p_275153_.getTo()));
 		});
 	}
+	
+	public static Entity getOwner(Entity entity)
+	{
+		LazyOptional<IOwnerCapability> cap = entity.getCapability(AnimeCapabilities.OWNER);
+		if(entity.getCapability(AnimeCapabilities.OWNER).isPresent())
+		{
+			return cap.resolve().get().getOwner();
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("deprecation")
+	public static Vec3 getGroundPosAbove(BlockGetter pLevel, double pX, double startY, double pZ)
+    {
+        BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos(pX, startY, pZ);
+        do
+        {
+        	blockpos$mutable.move(Direction.DOWN);
+        } 
+        while((pLevel.getBlockState(blockpos$mutable).isAir() || pLevel.getBlockState(blockpos$mutable).liquid() || !pLevel.getBlockState(blockpos$mutable).isCollisionShapeFullBlock(pLevel, blockpos$mutable)) && blockpos$mutable.getY() > pLevel.getMinBuildHeight());
+
+        BlockPos blockpos = blockpos$mutable.above();
+
+        return Vec3.atCenterOf(blockpos);
+    }
 	
 	public static Vec3 fromToVector(Vec3 from, Vec3 to)
 	{

@@ -31,8 +31,8 @@ public class ObjModelManager
 
     WavefrontObject defaultModel;
     LoadingCache<ResourceLocation, WavefrontObject> cache;
-    public static final ResourceLocation DEFAULT_MODEL = new ResourceLocation(MinsAnime.MODID, "models/entity/holopsicon.obj");
-    public static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(MinsAnime.MODID, "textures/entity/holopsicon.png");
+    public static final ResourceLocation DEFAULT_MODEL = new ResourceLocation(MinsAnime.MODID, "models/effect/holopsicon.obj");
+    public static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(MinsAnime.MODID, "textures/effect/holopsicon.png");
 
     private ObjModelManager()
     {

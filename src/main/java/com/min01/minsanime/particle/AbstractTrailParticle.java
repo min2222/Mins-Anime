@@ -3,6 +3,7 @@ package com.min01.minsanime.particle;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
+import com.min01.minsanime.misc.AnimeRenderType;
 import com.min01.minsanime.util.AnimeClientUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,7 +13,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -120,7 +120,7 @@ public abstract class AbstractTrailParticle extends Particle
 
     protected VertexConsumer getVetrexConsumer(MultiBufferSource.BufferSource multibuffersource$buffersource)
     {
-        return multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(this.getTrailTexture()));
+        return multibuffersource$buffersource.getBuffer(AnimeRenderType.eyesFix(this.getTrailTexture()));
     }
 
     public float getTrailRot(Camera camera) 

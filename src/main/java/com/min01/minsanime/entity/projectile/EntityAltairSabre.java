@@ -10,6 +10,9 @@ import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -25,8 +28,7 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class EntityAltairSabre extends ThrowableProjectile
 {
-	public SabreType type;
-	
+	public static final EntityDataAccessor<Boolean> IS_HOMING = SynchedEntityData.defineId(EntityAltairSabre.class, EntityDataSerializers.BOOLEAN);
 	public EntityAltairSabre(EntityType<? extends ThrowableProjectile> p_36721_, Level p_36722_)
 	{
 		super(p_36721_, p_36722_);
@@ -35,7 +37,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 	@Override
 	protected void defineSynchedData() 
 	{
-		
+		this.entityData.define(IS_HOMING, false);
 	}
 	
 	@Override
@@ -48,19 +50,16 @@ public class EntityAltairSabre extends ThrowableProjectile
 	public void addAdditionalSaveData(CompoundTag p_36772_) 
 	{
 		super.addAdditionalSaveData(p_36772_);
-		if(this.type != null)
-		{
-			p_36772_.putInt("SabreType", this.type.ordinal());
-		}
+		p_36772_.putBoolean("isHoming", this.isHoming());
 	}
 	
 	@Override
 	public void readAdditionalSaveData(CompoundTag p_36761_) 
 	{
 		super.readAdditionalSaveData(p_36761_);
-		if(p_36761_.contains("SabreType"))
+		if(p_36761_.contains("isHoming"))
 		{
-			this.type = SabreType.values()[p_36761_.getInt("SabreType")];
+			this.setHoming(p_36761_.getBoolean("isHoming"));
 		}
 	}
 	
@@ -70,21 +69,14 @@ public class EntityAltairSabre extends ThrowableProjectile
 		super.tick();
 		if(this.getOwner() != null)
 		{
-			if(this.type != null)
+			if(this.isHoming())
 			{
 				Mob owner = (Mob) this.getOwner();
 				Entity target = owner.getTarget();
 				if(target != null)
 				{
-					switch(this.type)
-					{
-					case HOMING:
-				    	this.lookAt(Anchor.EYES, target.getEyePosition());
-				    	this.shootFromRotation(owner, -this.getXRot(), -this.getYRot(), 0.0F, 1.5F, 1.0F);
-						break;
-					default:
-						break;
-					}
+			    	this.lookAt(Anchor.EYES, target.getEyePosition());
+			    	this.shootFromRotation(owner, -this.getXRot(), -this.getYRot(), 0.0F, 1.5F, 1.0F);
 				}
 				else if(!this.level.isClientSide)
 				{
@@ -97,9 +89,9 @@ public class EntityAltairSabre extends ThrowableProjectile
 			this.discard();
 		}
 		
-		if(this.type != SabreType.HOMING && this.tickCount >= 100 && !this.onGround())
+		if(!this.isHoming() && this.tickCount >= 100 && !this.onGround())
 		{
-			this.type = SabreType.HOMING;
+			this.setHoming(true);
 		}
 		
 		if(this.tickCount >= 300)
@@ -111,7 +103,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 	@Override
 	public void lookAt(Anchor p_20033_, Vec3 p_20034_) 
 	{
-		if(this.type == SabreType.HOMING)
+		if(this.isHoming())
 		{
 			Vec3 vec3 = p_20033_.apply(this);
 			double d0 = p_20034_.x - vec3.x;
@@ -150,7 +142,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 					entity.invulnerableTime = 0;
 				}
 				//TODO add slash effect
-				if(this.type == SabreType.HOMING)
+				if(this.isHoming())
 				{
 					this.discard();
 				}
@@ -168,6 +160,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 		this.setPosRaw(this.getX() - vec31.x, this.getY() - vec31.y, this.getZ() - vec31.z);
 		this.setOnGround(true);
 		this.setNoGravity(false);
+		this.setHoming(false);
 	}
 	
 	@Override
@@ -181,9 +174,14 @@ public class EntityAltairSabre extends ThrowableProjectile
 		return super.getOwner();
 	}
 	
-	public enum SabreType
+	public void setHoming(boolean value)
 	{
-		HOMING;
+		this.entityData.set(IS_HOMING, value);
+	}
+	
+	public boolean isHoming()
+	{
+		return this.entityData.get(IS_HOMING);
 	}
 	
 	public enum SabreAttackType

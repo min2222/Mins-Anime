@@ -40,6 +40,6 @@ public class AltairSabreRenderer extends EntityRenderer<EntityAltairSabre>
 	@Override
 	public ResourceLocation getTextureLocation(EntityAltairSabre p_114482_)
 	{
-		return new ResourceLocation(MinsAnime.MODID, "textures/entity/altair.png");
+		return new ResourceLocation(MinsAnime.MODID, "textures/entity/altair_sabre.png");
 	}
 }

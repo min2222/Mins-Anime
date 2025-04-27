@@ -50,7 +50,7 @@ public class AnimeRenderType extends RenderType
     
     public static RenderType holopsicon(ResourceLocation texture) 
     {
-        RenderType.CompositeState state = RenderType.CompositeState.builder().setShaderState(HOLOPSICON_SHADER).setOutputState(TRANSLUCENT_TARGET).setTextureState(new TextureStateShard(texture, false, false)).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setLightmapState(LIGHTMAP).setWriteMaskState(COLOR_WRITE).createCompositeState(true);
+        RenderType.CompositeState state = RenderType.CompositeState.builder().setShaderState(HOLOPSICON_SHADER).setOutputState(TRANSLUCENT_TARGET).setTextureState(new TextureStateShard(texture, true, false)).setTransparencyState(TRANSLUCENT_TRANSPARENCY).setLightmapState(LIGHTMAP).setWriteMaskState(COLOR_WRITE).createCompositeState(true);
         return RenderType.create("holopsicon", WavefrontObject.POSITION_TEX_LMAP_COL_NORMAL, VertexFormat.Mode.TRIANGLES, 256, true, false, state);
     }
     

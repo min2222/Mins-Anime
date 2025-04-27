@@ -4,8 +4,11 @@ import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.living.EntityAltair;
 import com.min01.minsanime.entity.model.ModelAltair;
 import com.min01.minsanime.entity.model.ModelAltairSabre;
+import com.min01.minsanime.misc.AnimeRenderType;
+import com.min01.minsanime.misc.HolopsiconAnimation;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.obj.WavefrontObject;
+import com.min01.minsanime.util.AnimeClientUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
@@ -18,9 +21,8 @@ import net.minecraft.resources.ResourceLocation;
 
 public class AltairRenderer extends MobRenderer<EntityAltair, ModelAltair>
 {
-    public static final WavefrontObject HOLOPSICON = ObjModelManager.getInstance().getModel(new ResourceLocation(MinsAnime.MODID, "models/entity/holopsicon.obj"));
-    public static final WavefrontObject WIND = ObjModelManager.getInstance().getModel(new ResourceLocation(MinsAnime.MODID, "models/entity/wind.obj"));
-    
+    public static final WavefrontObject HOLOPSICON = ObjModelManager.getInstance().getModel(new ResourceLocation(MinsAnime.MODID, "models/effect/holopsicon.obj"));
+    public static final ResourceLocation TEXTURE = new ResourceLocation(MinsAnime.MODID, "textures/effect/holopsicon.png");
     public final ModelAltairSabre sabreModel;
 	
 	public AltairRenderer(Context p_174304_) 
@@ -55,8 +57,14 @@ public class AltairRenderer extends MobRenderer<EntityAltair, ModelAltair>
 				p_115458_.mulPose(Axis.ZP.rotationDegrees(180.0F));
 			}
 			
-			this.sabreModel.renderToBuffer(p_115458_, p_115459_.getBuffer(RenderType.entityTranslucent(this.getTextureLocation(p_115455_))), p_115460_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+			this.sabreModel.renderToBuffer(p_115458_, p_115459_.getBuffer(RenderType.entityTranslucent(new ResourceLocation(MinsAnime.MODID, "textures/entity/altair_sabre.png"))), p_115460_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 			p_115458_.popPose();
+		}
+
+		if(p_115455_.isHolopsicon())
+		{
+			this.renderHolopsicon(p_115455_, p_115458_, p_115459_, p_115460_, p_115457_, false);
+			this.renderHolopsicon(p_115455_, p_115458_, p_115459_, p_115460_, p_115457_, true);
 		}
 	}
 
@@ -64,5 +72,23 @@ public class AltairRenderer extends MobRenderer<EntityAltair, ModelAltair>
 	public ResourceLocation getTextureLocation(EntityAltair p_115812_) 
 	{
 		return new ResourceLocation(MinsAnime.MODID, "textures/entity/altair.png");
+	}
+	
+	public void renderHolopsicon(EntityAltair entity, PoseStack stack, MultiBufferSource source, int light, float partialTicks, boolean outer)
+	{
+		stack.pushPose();
+		stack.scale(0.5F / 16.0F, 0.5F / 16.0F, 0.5F / 16.0F);
+		AnimeClientUtil.resetPose(HOLOPSICON);
+		if(outer)
+		{
+			AnimeClientUtil.animateObj(HOLOPSICON, entity.holopsiconOBJAnimationState, HolopsiconAnimation.SPELL, entity.tickCount + partialTicks);
+		}
+		else
+		{
+			AnimeClientUtil.animateObj(HOLOPSICON, entity.holopsiconOBJAnimationState, HolopsiconAnimation.DEATH, entity.tickCount + partialTicks);
+		}
+		AnimeClientUtil.animateObj(HOLOPSICON, entity.holopsiconUVAnimationState, HolopsiconAnimation.UV_ANIM, entity.tickCount + partialTicks);
+		AnimeClientUtil.renderObj(stack, source, HOLOPSICON, AnimeRenderType.holopsicon(TEXTURE), light);
+		stack.popPose();
 	}
 }

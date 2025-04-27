@@ -59,6 +59,9 @@ public class WavefrontObject
     public float xScale = 1.0F;
     public float yScale = 1.0F;
     public float zScale = 1.0F;
+    
+    public float xUV;
+    public float yUV;
 
     public WavefrontObject(ResourceLocation resource) throws ModelFormatException
     {
@@ -201,6 +204,12 @@ public class WavefrontObject
     	this.xScale += p_253957_.x();
         this.yScale += p_253957_.y();
         this.zScale += p_253957_.z();
+    }
+    
+    public void offsetUV(Vector3f p_253957_) 
+    {
+    	this.xUV += p_253957_.x();
+        this.yUV += p_253957_.y();
     }
 
     @OnlyIn(Dist.CLIENT)

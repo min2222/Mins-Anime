@@ -1,0 +1,10 @@
+{
+	"holopsicon": {
+		"sounds": [
+			{
+				"name": "minsanime:entity/holopsicon",
+				"stream": true
+			}
+		]
+	}
+}

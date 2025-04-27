@@ -4,7 +4,6 @@ import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.living.EntityAltair;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre.SabreAttackType;
-import com.min01.minsanime.entity.projectile.EntityAltairSabre.SabreType;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
@@ -36,7 +35,7 @@ public class AltairSabreAttackGoal extends AbstractAltairSkillGoal
 				EntityAltairSabre sabre = new EntityAltairSabre(AnimeEntities.ALTAIR_SABRE.get(), this.mob.level);
 				sabre.setOwner(this.mob);
 				sabre.setNoGravity(true);
-				sabre.type = SabreType.HOMING;
+				sabre.setHoming(true);
 		    	Vec3 lookPos = AnimeUtil.getLookPos(0, this.mob.getYRot() + i, 0, 4.5F);
 		    	sabre.setPos(this.mob.getEyePosition().add(lookPos));
 		    	sabre.shootFromRotation(this.mob, 0, this.mob.getYRot() + i, 0.0F, 1.5F, 1.0F);

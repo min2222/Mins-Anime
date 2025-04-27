@@ -98,7 +98,7 @@ public class SparkParticle extends AbstractTrailParticle
     @Override
     public float getTrailHeight() 
     {
-        return 0.2F;
+        return 0.15F;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class SparkParticle extends AbstractTrailParticle
         public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) 
 		{
             SparkParticle particle = new SparkParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
-            Vec3 color = Vec3.fromRGB24(16765696);
+            Vec3 color = Vec3.fromRGB24(16485165);
             particle.trailR = (float) color.x;
             particle.trailG = (float) color.y;
             particle.trailB = (float) color.z;

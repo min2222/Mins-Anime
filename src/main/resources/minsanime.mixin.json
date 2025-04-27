@@ -6,7 +6,8 @@
 	"mixins": [
 		"MixinLevel",
 		"MixinProjectileUtil",
-		"MixinLivingEntity"
+		"MixinLivingEntity",
+		"MixinEntity"
 	],
 	"client": [
 	],
