@@ -54,6 +54,7 @@ public class AltairRenderer extends MobRenderer<EntityAltair, ModelAltair>
 			}
 			else
 			{
+				p_115458_.mulPose(Axis.YP.rotationDegrees(45.0F));
 				p_115458_.mulPose(Axis.ZP.rotationDegrees(180.0F));
 			}
 			

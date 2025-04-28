@@ -6,12 +6,16 @@ import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.model.ModelAltair;
 import com.min01.minsanime.entity.model.ModelAltairSabre;
+import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.entity.renderer.AltairRenderer;
 import com.min01.minsanime.entity.renderer.AltairSabreRenderer;
+import com.min01.minsanime.entity.renderer.FrierenRenderer;
 import com.min01.minsanime.misc.AnimeRenderType;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.particle.AnimeParticles;
 import com.min01.minsanime.particle.SparkParticle;
+import com.min01.minsanime.shader.AnimeShaders;
+import com.min01.minsanime.shader.ShaderEffectHandler;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.client.renderer.ShaderInstance;
@@ -31,6 +35,7 @@ public class ClientEventHandler
 	public static void onFMLClientSetup(FMLClientSetupEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(ObjModelManager.getInstance());
+		ShaderEffectHandler.registerEffect(AnimeShaders.BLUR);
 	}
 	
     @SubscribeEvent
@@ -53,6 +58,7 @@ public class ClientEventHandler
     {
     	event.registerLayerDefinition(ModelAltair.LAYER_LOCATION, ModelAltair::createBodyLayer);
     	event.registerLayerDefinition(ModelAltairSabre.LAYER_LOCATION, ModelAltairSabre::createBodyLayer);
+    	event.registerLayerDefinition(ModelFrieren.LAYER_LOCATION, ModelFrieren::createBodyLayer);
     }
     
     @SubscribeEvent
@@ -60,5 +66,6 @@ public class ClientEventHandler
     {
     	event.registerEntityRenderer(AnimeEntities.ALTAIR.get(), AltairRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.ALTAIR_SABRE.get(), AltairSabreRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.FRIEREN.get(), FrierenRenderer::new);
     }
 }

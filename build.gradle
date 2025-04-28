@@ -160,10 +160,12 @@ dependencies {
 	annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
     implementation fg.deobf("curse.maven:assets-protector-1032813:6237647")
 	implementation fg.deobf("curse.maven:tickrate-api-969702:6237424")
-	implementation fg.deobf("curse.maven:lendercataclysm-551586:6331219")
-	implementation fg.deobf("curse.maven:lionfish-api-1001614:5922047")
-	implementation fg.deobf("curse.maven:curios-309927:6238756")
+	
+	runtimeOnly fg.deobf("curse.maven:lendercataclysm-551586:6331219")
+	runtimeOnly fg.deobf("curse.maven:lionfish-api-1001614:5922047")
+	runtimeOnly fg.deobf("curse.maven:curios-309927:6238756")
 	runtimeOnly fg.deobf("curse.maven:mob-battle-mod-268746:5950124")
+	runtimeOnly fg.deobf("curse.maven:mob-battle-extra-853296:4810120")
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

@@ -27,7 +27,6 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(1);
-		this.mob.playSound(AnimeSounds.HOLOPSICON.get());
 		if(!this.mob.getTarget().getActiveEffects().isEmpty())
 		{
 			this.movement = HolopsiconMovement.NO13;
@@ -47,6 +46,7 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 	protected void performSkill() 
 	{
 		this.mob.setHolopsicon(true);
+		this.mob.playSound(AnimeSounds.HOLOPSICON.get(), 15.0F, 1.0F);
 		if(this.mob.getTarget() != null && this.movement != null)
 		{
 			switch(this.movement)
@@ -93,7 +93,7 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 	@Override
 	protected int getSkillUsingTime() 
 	{
-		return 75;
+		return 60;
 	}
 	
 	@Override

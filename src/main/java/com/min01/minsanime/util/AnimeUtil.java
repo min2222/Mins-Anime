@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.joml.Math;
+
 import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.capabilities.IOwnerCapability;
 
@@ -19,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.LazyOptional;
@@ -132,6 +135,25 @@ public class AnimeUtil
         double y = startPos.y + (level.random.nextDouble() - level.random.nextDouble()) * range + 0.5D;
         double z = startPos.z + (level.random.nextDouble() - level.random.nextDouble()) * range + 0.5D;
         return new Vec3(x, y, z);
+	}
+	
+	public static Vec3 getLookPos(Vec2 rotation, Vec3 position, double left, double up, double forwards) 
+	{
+		Vec2 vec2 = rotation;
+		Vec3 vec3 = position;
+		float f = Mth.cos((vec2.y + 90.0F) * ((float)Math.PI / 180.0F));
+		float f1 = Mth.sin((vec2.y + 90.0F) * ((float)Math.PI / 180.0F));
+		float f2 = Mth.cos(-vec2.x * ((float)Math.PI / 180.0F));
+		float f3 = Mth.sin(-vec2.x * ((float)Math.PI / 180.0F));
+		float f4 = Mth.cos((-vec2.x + 90.0F) * ((float)Math.PI / 180.0F));
+		float f5 = Mth.sin((-vec2.x + 90.0F) * ((float)Math.PI / 180.0F));
+		Vec3 vec31 = new Vec3((double)(f * f2), (double)f3, (double)(f1 * f2));
+		Vec3 vec32 = new Vec3((double)(f * f4), (double)f5, (double)(f1 * f4));
+		Vec3 vec33 = vec31.cross(vec32).scale(-1.0D);
+		double d0 = vec31.x * forwards + vec32.x * up + vec33.x * left;
+		double d1 = vec31.y * forwards + vec32.y * up + vec33.y * left;
+		double d2 = vec31.z * forwards + vec32.z * up + vec33.z * left;
+		return new Vec3(vec3.x + d0, vec3.y + d1, vec3.z + d2);
 	}
 	
 	public static Vec3 getLookPos(float xRot, float yRot, float yPos, double distance)

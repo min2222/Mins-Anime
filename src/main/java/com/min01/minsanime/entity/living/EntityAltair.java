@@ -193,7 +193,6 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
     {
     	if(!p_21016_.is(DamageTypeTags.BYPASSES_INVULNERABILITY))
     	{
-    		this.setHurt(this.getHurt() + p_21017_);
     		if(this.hasSabre())
     		{
         		this.setHurt(true);
@@ -237,6 +236,7 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
     			return false;
     		}
     	}
+		this.setHurt(this.getHurt() + p_21017_);
     	return super.hurt(p_21016_, p_21017_);
     }
     

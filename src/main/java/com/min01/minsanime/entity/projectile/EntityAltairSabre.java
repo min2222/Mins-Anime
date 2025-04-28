@@ -137,11 +137,10 @@ public class EntityAltairSabre extends ThrowableProjectile
 		{
 			if(entity != this.getOwner() && !entity.isAlliedTo(this.getOwner()))
 			{
-				if(entity.hurt(this.damageSources().mobProjectile(this, (LivingEntity) this.getOwner()), 15.0F))
+				if(entity.hurt(this.damageSources().mobAttack((LivingEntity) this.getOwner()), 10.0F))
 				{
 					entity.invulnerableTime = 0;
 				}
-				//TODO add slash effect
 				if(this.isHoming())
 				{
 					this.discard();

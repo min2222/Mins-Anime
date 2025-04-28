@@ -18,6 +18,7 @@ public class AnimeItems
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MinsAnime.MODID);
 	
 	public static final RegistryObject<Item> ALTAIR_SPAWN_EGG = registerSpawnEgg("altair_spawn_egg", () -> AnimeEntities.ALTAIR.get(), 0, 0);
+	public static final RegistryObject<Item> FRIEREN_SPAWN_EGG = registerSpawnEgg("frieren_spawn_egg", () -> AnimeEntities.FRIEREN.get(), 0, 0);
 	
 	public static <T extends Mob> RegistryObject<Item> registerSpawnEgg(String name, Supplier<EntityType<T>> entity, int color1, int color2) 
 	{

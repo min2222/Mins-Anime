@@ -2,6 +2,7 @@ package com.min01.minsanime.entity;
 
 import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.living.EntityAltair;
+import com.min01.minsanime.entity.living.EntityFrieren;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre;
 
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,8 @@ public class AnimeEntities
 	
 	public static final RegistryObject<EntityType<EntityAltair>> ALTAIR = registerEntity("altair", createBuilder(EntityAltair::new, MobCategory.MONSTER).fireImmune());
 	public static final RegistryObject<EntityType<EntityAltairSabre>> ALTAIR_SABRE = registerEntity("altair_sabre", createBuilder(EntityAltairSabre::new, MobCategory.MISC).sized(0.5F, 0.5F));
+
+	public static final RegistryObject<EntityType<EntityFrieren>> FRIEREN = registerEntity("frieren", createBuilder(EntityFrieren::new, MobCategory.CREATURE).fireImmune());
 	
 	public static <T extends Entity> EntityType.Builder<T> createBuilder(EntityType.EntityFactory<T> factory, MobCategory category)
 	{
