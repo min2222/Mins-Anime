@@ -62,7 +62,7 @@ public class AnimeRenderType extends RenderType
     
     public static RenderType blur(ResourceLocation texture)
     {
-        return create("blur", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.QUADS, 256, false, true, RenderType.CompositeState.builder().setShaderState(RENDERTYPE_EYES_SHADER).setCullState(NO_CULL).setTextureState(new RenderStateShard.TextureStateShard(texture, false, false)).setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY).setDepthTestState(LEQUAL_DEPTH_TEST).setOutputState(BLUR_OUTPUT).createCompositeState(false));
+        return create("blur", DefaultVertexFormat.POSITION_COLOR_TEX, VertexFormat.Mode.TRIANGLE_STRIP, 256, false, true, RenderType.CompositeState.builder().setShaderState(RENDERTYPE_EYES_SHADER).setCullState(NO_CULL).setTextureState(new RenderStateShard.TextureStateShard(texture, false, false)).setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY).setDepthTestState(LEQUAL_DEPTH_TEST).setOutputState(BLUR_OUTPUT).createCompositeState(false));
     }
     
     public static RenderType objBlend(ResourceLocation texture)

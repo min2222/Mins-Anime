@@ -156,6 +156,18 @@ public class AnimeUtil
 		return new Vec3(vec3.x + d0, vec3.y + d1, vec3.z + d2);
 	}
 	
+	public static Vec2 lookAt(Vec3 startPos, Vec3 pos)
+	{
+		Vec3 vec3 = startPos;
+		double d0 = pos.x - vec3.x;
+		double d1 = pos.y - vec3.y;
+		double d2 = pos.z - vec3.z;
+		double d3 = Math.sqrt(d0 * d0 + d2 * d2);
+		float xRot = Mth.wrapDegrees((float)(-(Mth.atan2(d1, d3) * (double)(180.0F / (float)Math.PI))));
+		float yRot = Mth.wrapDegrees((float)(Mth.atan2(d2, d0) * (double)(180.0F / (float)Math.PI)) - 90.0F);
+	    return new Vec2(xRot, yRot);
+	}
+	
 	public static Vec3 getLookPos(float xRot, float yRot, float yPos, double distance)
 	{
 		float f = -Mth.sin(yRot * ((float)Math.PI / 180F)) * Mth.cos(xRot * ((float)Math.PI / 180F));
