@@ -85,6 +85,13 @@ public class AnimeUtil
 		return motion;
 	}
 	
+	//ChatGPT ahh;
+	public static Vec3 bezierMotionVector(Vec3 start, Vec3 control, Vec3 end, float t, float speed) 
+	{
+	    Vec3 derivative = start.subtract(control).scale(2 * (1 - t)).add(end.subtract(control).scale(2 * t));
+	    return derivative.normalize().scale(speed);
+	}
+	
 	public static Vec3 fromToVector(Vec3 from, Vec3 to, float scale)
 	{
 		Vec3 motion = to.subtract(from).normalize();

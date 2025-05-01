@@ -116,7 +116,7 @@ public class AnimeClientUtil
         Matrix4f matrix = stack.last().pose();
 
         // Control point for a curved path (simple quadratic bezier)
-        Vec3 control = start.add(end).scale(0.5).add(0, curveHeight / 2, 0);
+        Vec3 control = start.add(end).scale(0.1F).add(0, curveHeight / 2, 0);
 
         List<Vec3> curvePoints = new ArrayList<>();
         List<Vec3> tangents = new ArrayList<>();
@@ -132,7 +132,7 @@ public class AnimeClientUtil
             curvePoints.add(point);
 
             // Compute tangent using central difference if possible
-            float dt = 1.0f / curveSteps;
+            float dt = 1.0F / curveSteps;
             Vec3 tangent;
             if(i == 0)
             {

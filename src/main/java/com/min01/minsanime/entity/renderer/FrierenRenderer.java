@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.living.EntityFrieren;
+import com.min01.minsanime.entity.living.EntityFrieren.LaserType;
 import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.misc.AnimeRenderType;
 import com.min01.minsanime.shader.AnimeShaders;
 import com.min01.minsanime.shader.ShaderEffectHandler;
 import com.min01.minsanime.util.AnimeClientUtil;
+import com.min01.minsanime.util.AnimeUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
@@ -38,24 +40,28 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 		{
 			p_115458_.pushPose();
 			Vec2 rot = t.rotation;
-			Vec3 pos = t.position;
-			Vec3 localPos = pos.subtract(p_115455_.getPosition(p_115457_));
-			p_115458_.translate(localPos.x, localPos.y, localPos.z);
-			p_115458_.mulPose(Axis.YP.rotationDegrees(rot.y));
+			Vec3 pos = t.position.subtract(p_115455_.getPosition(p_115457_));
+			p_115458_.translate(pos.x, pos.y, pos.z);
+			p_115458_.mulPose(Axis.YP.rotationDegrees(-rot.y + 180.0F));
 			p_115458_.mulPose(Axis.XP.rotationDegrees(-rot.x));
 			
 			p_115458_.pushPose();
 			p_115458_.mulPose(Axis.XP.rotationDegrees(-90.0F));
 	        Vec3 color = Vec3.fromRGB24(15659769);
-	        Vec3 end = t.target.getEyePosition(p_115460_).subtract(pos);
-	        end = end.yRot((float) Math.toRadians(-rot.y)).xRot((float) Math.toRadians(-rot.x));
+	        Vec3 start = AnimeUtil.getLookPos(rot, Vec3.ZERO, 0.0F, 0.5F, 0.0F);
+	        if(t.type == LaserType.BIG)
+	        {
+	        	start = AnimeUtil.getLookPos(rot, Vec3.ZERO, 0.0F, 3.5F, 0.0F);
+	        }
+	        Vec3 end = t.getEndPos(p_115457_, p_115455_.level);
+	        end = end.yRot((float) Math.toRadians(rot.y - 180.0F)).xRot((float) Math.toRadians(-rot.x));
 	        end = new Vec3(end.x, -end.z, end.y);
-	        AnimeClientUtil.drawCurvedCylinder(p_115458_, p_115459_.getBuffer(AnimeRenderType.blur(new ResourceLocation(MinsAnime.MODID, "textures/effect/white.png"))), Vec3.ZERO, end, 0.5F, 10.0F, 32, 32, (float)color.x, (float)color.y, (float)color.z, 1.0F);
+	        AnimeClientUtil.drawCurvedCylinder(p_115458_, p_115459_.getBuffer(AnimeRenderType.blur(new ResourceLocation(MinsAnime.MODID, "textures/effect/white.png"))), start, end, t.laserSize, t.distance, 32, 32, (float)color.x, (float)color.y, (float)color.z, 1.0F);
 			p_115458_.popPose();
 
 			p_115458_.pushPose();
 			p_115458_.mulPose(Axis.ZP.rotationDegrees(p_115455_.tickCount / 2));
-			AnimeClientUtil.renderFlatQuad(p_115458_, p_115459_.getBuffer(AnimeRenderType.eyesNoAlpha(new ResourceLocation(MinsAnime.MODID, "textures/effect/zoltraak.png"))), 1.0F, LightTexture.FULL_BRIGHT);
+			AnimeClientUtil.renderFlatQuad(p_115458_, p_115459_.getBuffer(AnimeRenderType.eyesNoAlpha(new ResourceLocation(MinsAnime.MODID, "textures/effect/zoltraak.png"))), t.circleSize, LightTexture.FULL_BRIGHT);
 			p_115458_.popPose();
 			
 			p_115458_.popPose();
