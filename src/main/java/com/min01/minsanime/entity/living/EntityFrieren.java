@@ -259,18 +259,16 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	public Vec3 getEndPos(float partialTicks, Level level) 
     	{
     		Entity target = this.getTarget(level);
-    	    Vec3 start = this.position;
     	    if(this.type == LaserType.BIG)
     	    {
     	    	return AnimeUtil.getLookPos(this.rotation, Vec3.ZERO, 0.0F, 0.0F, this.distance);
     	    }
     	    else if(target != null)
     	    {
+        	    Vec3 start = this.position;
         	    Vec3 end = target.getEyePosition(partialTicks);
-        	    float curveHeight = this.distance;
-        	    Vec3 control = start.add(end).scale(0.5F).add(0, curveHeight / 2, 0);
-        	    float t = this.distance;
-        	    Vec3 motion = AnimeUtil.bezierMotionVector(start, control, end, t, this.distance);
+        	    Vec3 control = start.add(end).scale(0.5F).add(0, this.distance / 2, 0);
+        	    Vec3 motion = AnimeUtil.bezierMotionVector(start, control, end, this.distance, this.distance);
         	    return motion;
     	    }
     	    return Vec3.ZERO;
