@@ -109,6 +109,9 @@ public class EntityFrieren extends AbstractAnimatableCreature
     {
     	public final Vec3 position;
     	public final Vec2 rotation;
+    	
+    	public Vec3 targetPos = Vec3.ZERO;
+    	public Vec3 targetPos2 = Vec3.ZERO;
 
     	public final int ownerId;
     	public final int targetId;
@@ -171,14 +174,13 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	public void tick(Level level)
     	{
     		Entity target = this.getTarget(level);
-    		Vec3 pos = null;
     		if(target != null)
     		{
-    			pos = target.getEyePosition();
+    			this.targetPos = target.getEyePosition();
     		}
     		if(this.type == LaserType.BIG)
     		{
-    			pos = AnimeUtil.getLookPos(this.rotation, this.position, 0.0F, 0.0F, 100.0F);
+    			this.targetPos = AnimeUtil.getLookPos(this.rotation, this.position, 0.0F, 0.0F, 100.0F);
     		}
     		if(this.mode.equals("Decrease"))
     		{
@@ -202,24 +204,21 @@ public class EntityFrieren extends AbstractAnimatableCreature
             		this.laserSize = (float) Math.min(this.laserSize, this.laserMaxSize);
         		}
     		}
-    		if(Math.floor(this.circleSize) == this.circleMaxSize && pos != null)
+    		if(Math.floor(this.circleSize) == this.circleMaxSize)
     		{
     			this.distance += this.distanceIncrease;
-    			this.distance = (float) Math.min(this.distance, this.position.distanceTo(pos));
+    			this.distance = (float) Math.min(this.distance, this.position.distanceTo(this.targetPos));
     		}
 	        if(this.laserSize == this.laserMaxSize)
 	        {
 	        	Entity owner = this.getOwner(level);
-	        	if(pos != null)
+	        	if(Math.floor(this.distance) == Math.floor(this.position.distanceTo(this.targetPos)))
 	        	{
-		        	if(Math.floor(this.distance) == Math.floor(this.position.distanceTo(pos)))
-		        	{
-	    	        	if(owner != null && target != null && this.type != LaserType.BIG)
-	    	        	{
-	        	        	target.hurt(target.damageSources().indirectMagic(owner, owner), 20.0F);
-	    	        	}
-	    	        	this.mode = "Decrease";
-		        	}
+    	        	if(owner != null && target != null && this.type != LaserType.BIG)
+    	        	{
+        	        	target.hurt(target.damageSources().indirectMagic(owner, owner), 20.0F);
+    	        	}
+    	        	this.mode = "Decrease";
 	        	}
 	        	if(this.type == LaserType.BIG)
 	        	{
@@ -259,19 +258,19 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	public Vec3 getEndPos(float partialTicks, Level level) 
     	{
     		Entity target = this.getTarget(level);
+    		if(target != null)
+    		{
+    			this.targetPos2 = target.getEyePosition(partialTicks);
+    		}
     	    if(this.type == LaserType.BIG)
     	    {
     	    	return AnimeUtil.getLookPos(this.rotation, Vec3.ZERO, 0.0F, 0.0F, this.distance);
     	    }
-    	    else if(target != null)
-    	    {
-        	    Vec3 start = this.position;
-        	    Vec3 end = target.getEyePosition(partialTicks);
-        	    Vec3 control = start.add(end).scale(0.5F).add(0, this.distance / 2, 0);
-        	    Vec3 motion = AnimeUtil.bezierMotionVector(start, control, end, this.distance, this.distance);
-        	    return motion;
-    	    }
-    	    return Vec3.ZERO;
+    	    Vec3 start = this.position;
+    	    Vec3 end = this.targetPos2;
+    	    Vec3 control = start.add(end).scale(0.5F).add(0, this.distance / 2, 0);
+    	    Vec3 motion = AnimeUtil.bezierMotionVector(start, control, end, this.distance, this.distance);
+    	    return motion;
     	}
     	
     	public Entity getOwner(Level level)
