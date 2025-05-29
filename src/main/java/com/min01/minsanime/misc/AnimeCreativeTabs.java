@@ -15,7 +15,7 @@ public class AnimeCreativeTabs
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TAB = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MinsAnime.MODID);
     
     public static final RegistryObject<CreativeModeTab> MINS_ANIME = CREATIVE_MODE_TAB.register("minsanime", () -> CreativeModeTab.builder()
-    		.title(Component.translatable("itemGroup.minsanime.minsanime"))
+    		.title(Component.translatable("itemGroup.minsanime"))
     		.icon(() -> new ItemStack(AnimeItems.FRIEREN_SPAWN_EGG.get()))
     		.displayItems((enabledFeatures, output) -> 
     		{
