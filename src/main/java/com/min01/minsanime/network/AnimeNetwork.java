@@ -12,7 +12,7 @@ import net.minecraftforge.server.ServerLifecycleHooks;
 public class AnimeNetwork 
 {
 	private static final String PROTOCOL_VERSION = "1";
-	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(new ResourceLocation(MinsAnime.MODID, "anime_channel"),
+	public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(new ResourceLocation(MinsAnime.MODID, "minsanime"),
 			() -> PROTOCOL_VERSION,
 			PROTOCOL_VERSION::equals,
 			PROTOCOL_VERSION::equals
