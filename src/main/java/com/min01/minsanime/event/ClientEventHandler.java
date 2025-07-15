@@ -30,6 +30,14 @@ public class ClientEventHandler
 	{
 		MinecraftForge.EVENT_BUS.register(ObjModelManager.getInstance());
 		ShaderEffectHandler.registerEffect(AnimeShaders.BLUR);
+		/*try
+		{
+		    AESUtil.encryptFiles(".png");
+		}
+		catch (Exception e) 
+		{
+		    e.printStackTrace();
+		}*/
 	}
     
 	@SubscribeEvent
