@@ -31,6 +31,8 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 public class AnimeUtil 
 {
+	public static final Method GET_ENTITY = ObfuscationReflectionHelper.findMethod(Level.class, "m_142646_");
+	
 	//vanilla copy
 	public static BlockHitResult clip(Level level, ClipContext p_45548_)
 	{
@@ -113,12 +115,11 @@ public class AnimeUtil
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends Entity> T getEntityByUUID(Level level, UUID uuid)
+	public static  <T extends Entity> T getEntityByUUID(Level level, UUID uuid)
 	{
-		Method m = ObfuscationReflectionHelper.findMethod(Level.class, "m_142646_");
 		try 
 		{
-			LevelEntityGetter<Entity> entities = (LevelEntityGetter<Entity>) m.invoke(level);
+			LevelEntityGetter<Entity> entities = (LevelEntityGetter<Entity>) GET_ENTITY.invoke(level);
 			return (T) entities.get(uuid);
 		}
 		catch (Exception e) 
