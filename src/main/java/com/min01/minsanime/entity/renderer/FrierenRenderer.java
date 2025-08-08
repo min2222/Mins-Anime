@@ -39,6 +39,7 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 		new ArrayList<>(p_115455_.zoltraak).forEach(t -> 
 		{
 			p_115458_.pushPose();
+			
 			Vec2 rot = t.rotation;
 			Vec3 pos = t.position.subtract(p_115455_.getPosition(p_115457_));
 			p_115458_.translate(pos.x, pos.y, pos.z);
