@@ -32,7 +32,7 @@ public class ClientEventHandler
 		ShaderEffectHandler.registerEffect(AnimeShaders.BLUR);
 		/*try
 		{
-		    AESUtil.encryptFiles(".png");
+		    AnimeUtil.encryptFiles("2103yt984298yg", "@N(*@)$9gj9g", ".png");
 		}
 		catch (Exception e) 
 		{
