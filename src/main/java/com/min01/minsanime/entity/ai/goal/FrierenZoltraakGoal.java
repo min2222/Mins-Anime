@@ -20,25 +20,29 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 	public void start()
 	{
 		super.start();
-		this.type = LaserType.getRandom();
+		this.mob.setAnimationState(1);
+		this.type = LaserType.getRandom(this.mob.getRandom());
 	}
 
 	@Override
 	protected void performSkill() 
 	{
-		if(this.type == LaserType.SINGLE)
+		if(this.mob.getTarget() != null)
 		{
-			Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
-			this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
-		}
-		if(this.type == LaserType.MULTI)
-		{
-			
-		}
-		if(this.type == LaserType.BIG)
-		{
-			Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
-			this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
+			if(this.type == LaserType.SINGLE)
+			{
+				Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
+				this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
+			}
+			if(this.type == LaserType.MULTI)
+			{
+				
+			}
+			if(this.type == LaserType.BIG)
+			{
+				Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
+				this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
+			}
 		}
 	}
 	
@@ -60,6 +64,7 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 	public void stop() 
 	{
 		super.stop();
+		this.mob.setAnimationState(0);
 	}
 
 	@Override
@@ -71,12 +76,12 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 	@Override
 	protected int getSkillWarmupTime() 
 	{
-		return 1;
+		return 10;
 	}
 
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 20;
+		return 40;
 	}
 }

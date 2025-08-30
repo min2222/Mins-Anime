@@ -11,8 +11,6 @@ import com.min01.minsanime.entity.renderer.FrierenRenderer;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.particle.AnimeParticles;
 import com.min01.minsanime.particle.SparkParticle;
-import com.min01.minsanime.shader.AnimeShaders;
-import com.min01.minsanime.shader.ShaderEffectHandler;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -29,7 +27,6 @@ public class ClientEventHandler
 	public static void onFMLClientSetup(FMLClientSetupEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(ObjModelManager.getInstance());
-		ShaderEffectHandler.registerEffect(AnimeShaders.BLUR);
 		/*try
 		{
 		    AnimeUtil.encryptFiles("2103yt984298yg", "@N(*@)$9gj9g", ".png");

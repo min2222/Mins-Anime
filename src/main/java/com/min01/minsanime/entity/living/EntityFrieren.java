@@ -1,20 +1,23 @@
 package com.min01.minsanime.entity.living;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import com.min01.minsanime.entity.AbstractAnimatableCreature;
+import com.min01.minsanime.entity.ai.control.FlyingMoveControl;
 import com.min01.minsanime.entity.ai.goal.FrierenZoltraakGoal;
 import com.min01.minsanime.misc.AnimeEntityDataSerializers;
+import com.min01.minsanime.misc.SmoothAnimationState;
 import com.min01.minsanime.network.AnimeNetwork;
 import com.min01.minsanime.network.UpdateZoltraakPacket;
 import com.min01.minsanime.util.AnimeUtil;
 
-import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
+import net.minecraft.Util;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,12 +25,14 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Phantom;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -37,7 +42,14 @@ import net.minecraft.world.phys.Vec3;
 
 public class EntityFrieren extends AbstractAnimatableCreature
 {
+	public static final EntityDataAccessor<Boolean> IS_FLYING = SynchedEntityData.defineId(EntityFrieren.class, EntityDataSerializers.BOOLEAN);
+	
 	public final List<Laser> zoltraak = new ArrayList<>();
+	
+	public final SmoothAnimationState zoltraakAnimationState = new SmoothAnimationState(1.0F);
+	public final SmoothAnimationState flyStartAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState flyLoopAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState flyEndAnimationState = new SmoothAnimationState();
 	
 	public EntityFrieren(EntityType<? extends PathfinderMob> p_33002_, Level p_33003_)
 	{
@@ -55,6 +67,13 @@ public class EntityFrieren extends AbstractAnimatableCreature
     }
     
     @Override
+    protected void defineSynchedData() 
+    {
+    	super.defineSynchedData();
+    	this.entityData.define(IS_FLYING, false);
+    }
+    
+    @Override
     protected void registerGoals()
     {
 		this.goalSelector.addGoal(0, new FloatGoal(this));
@@ -62,6 +81,7 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
     	this.goalSelector.addGoal(0, new FrierenZoltraakGoal(this));
     	this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Monster.class, false));
+    	this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Phantom.class, false));
     	this.targetSelector.addGoal(0, new HurtByTargetGoal(this));
     }
     
@@ -74,10 +94,71 @@ public class EntityFrieren extends AbstractAnimatableCreature
     		t.tick(this.level);
     	});
     	this.zoltraak.removeIf(t -> t.shouldRemove());
+    	
+    	if(this.level.isClientSide)
+    	{
+    		this.zoltraakAnimationState.updateWhen(this.isUsingSkill(1) && !this.isFlying(), this.tickCount);
+    		this.flyStartAnimationState.updateWhen(this.getAnimationState() == 2, this.tickCount);
+    		this.flyLoopAnimationState.updateWhen(this.isFlying() && this.getAnimationState() != 3, this.tickCount);
+    		this.flyEndAnimationState.updateWhen(this.getAnimationState() == 3, this.tickCount);
+    	}
 
     	if(this.getTarget() != null)
     	{
-    		this.lookAt(Anchor.EYES, this.getTarget().getEyePosition());
+    		if(this.canLook())
+    		{
+        		this.getLookControl().setLookAt(this.getTarget(), 30.0F, 30.0F);
+    		}
+    		if(this.canMove())
+    		{
+				if(this.isFlying())
+				{
+					Vec3 vec3 = this.getTarget().position();
+					this.moveControl.setWantedPosition(vec3.x, vec3.y, vec3.z, 0.8F);
+				}
+				else
+				{
+					this.getNavigation().moveTo(this.getTarget(), 0.5F);
+				}
+    		}
+			if(!this.isUsingSkill())
+			{
+				if(this.getTarget().onGround() && this.getTarget().getY() <= this.getY() && this.isFlying())
+				{
+					if(this.getAnimationState() == 0)
+					{
+						this.setAnimationState(3);
+						this.setAnimationTick(20);
+					}
+				}
+				if(!this.getTarget().onGround() && this.onGround() && !this.isFlying())
+				{
+					if(this.getAnimationState() == 0)
+					{
+						this.setAnimationState(2);
+						this.setAnimationTick(20);
+					}
+				}
+			}
+    	}
+    	
+    	if(this.isFlying())
+    	{
+			this.resetFallDistance();
+    	}
+    	
+    	if(this.getAnimationTick() <= 0)
+    	{
+    		if(this.getAnimationState() == 2)
+    		{
+    			this.setAnimationState(0);
+    			this.setFlying(true);
+    		}
+    		if(this.getAnimationState() == 3)
+    		{
+    			this.setAnimationState(0);
+    			this.setFlying(false);
+    		}
     	}
     }
     
@@ -88,6 +169,30 @@ public class EntityFrieren extends AbstractAnimatableCreature
 		AnimeNetwork.sendToAll(new UpdateZoltraakPacket(this, laser));
     }
     
+    public void switchControl(boolean isFlying)
+    {
+    	if(isFlying)
+    	{
+    		this.moveControl = new FlyingMoveControl(this);
+    	}
+    	else
+    	{
+    		this.moveControl = new MoveControl(this);
+    	}
+    }
+    
+    public void setFlying(boolean value)
+    {
+        this.setNoGravity(value);
+		this.switchControl(value);
+    	this.entityData.set(IS_FLYING, value);
+    }
+    
+    public boolean isFlying() 
+    {
+    	return this.entityData.get(IS_FLYING);
+    }
+    
     public static enum LaserType
     {
     	SINGLE,
@@ -95,13 +200,9 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	RAPID,
     	BIG;
     	
-		private static final List<LaserType> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
-		private static final int SIZE = VALUES.size();
-		private static final Random RANDOM = new Random();
-
-		public static LaserType getRandom() 
+		public static LaserType getRandom(RandomSource source) 
 		{
-			return VALUES.get(RANDOM.nextInt(SIZE));
+			return Util.getRandom(values(), source);
 		}
     }
     

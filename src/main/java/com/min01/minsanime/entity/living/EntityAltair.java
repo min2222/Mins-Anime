@@ -2,10 +2,11 @@ package com.min01.minsanime.entity.living;
 
 import com.min01.minsanime.entity.AbstractAnimatableMonster;
 import com.min01.minsanime.entity.IClipPos;
-import com.min01.minsanime.entity.ai.control.FlyingMoveControl;
+import com.min01.minsanime.entity.ai.control.HoveringMoveControl;
 import com.min01.minsanime.entity.ai.goal.AltairHolopsiconGoal;
 import com.min01.minsanime.entity.ai.goal.AltairSabreAttackGoal;
 import com.min01.minsanime.entity.ai.goal.AltairSummonSabreGoal;
+import com.min01.minsanime.misc.SmoothAnimationState;
 import com.min01.minsanime.particle.AnimeParticles;
 import com.min01.minsanime.util.AnimeUtil;
 
@@ -42,8 +43,8 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
 	public static final EntityDataAccessor<Boolean> IS_HURT = SynchedEntityData.defineId(EntityAltair.class, EntityDataSerializers.BOOLEAN);
 	public static final EntityDataAccessor<Float> HURT = SynchedEntityData.defineId(EntityAltair.class, EntityDataSerializers.FLOAT);
 
-	public final AnimationState idleAnimationState = new AnimationState();
-	public final AnimationState holopsiconAnimationState = new AnimationState();
+	public final SmoothAnimationState idleAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState holopsiconAnimationState = new SmoothAnimationState();
 	public final AnimationState holopsiconOBJAnimationState = new AnimationState();
 	public final AnimationState holopsiconUVAnimationState = new AnimationState();
 	
@@ -52,7 +53,7 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
 	public EntityAltair(EntityType<? extends Monster> p_33002_, Level p_33003_) 
 	{
 		super(p_33002_, p_33003_);
-        this.moveControl = new FlyingMoveControl(this);
+        this.moveControl = new HoveringMoveControl(this);
 	}
 	
     public static AttributeSupplier.Builder createAttributes()
@@ -86,34 +87,6 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
     	this.goalSelector.addGoal(0, new AltairHolopsiconGoal(this));
     	this.targetSelector.addGoal(0, new HurtByTargetGoal(this));
     }
-    
-	@Override
-	public void onSyncedDataUpdated(EntityDataAccessor<?> p_219422_) 
-	{
-        if(ANIMATION_STATE.equals(p_219422_) && this.level.isClientSide) 
-        {
-            switch(this.getAnimationState()) 
-            {
-        		case 0: 
-        		{
-        			this.stopAllAnimationStates();
-        			break;
-        		}
-        		case 1: 
-        		{
-        			this.stopAllAnimationStates();
-        			this.holopsiconAnimationState.start(this.tickCount);
-        			break;
-        		}
-            }
-        }
-	}
-	
-	@Override
-	public void stopAllAnimationStates() 
-	{
-		this.holopsiconAnimationState.stop();
-	}
     
     @Override
     public void travel(Vec3 p_20818_)
@@ -183,6 +156,7 @@ public class EntityAltair extends AbstractAnimatableMonster implements IClipPos
     	if(this.level.isClientSide)
     	{
     		this.idleAnimationState.startIfStopped(this.tickCount);
+    		this.holopsiconAnimationState.updateWhen(this.isUsingSkill(1), this.tickCount);
     		this.holopsiconOBJAnimationState.animateWhen(this.isHolopsicon(), this.tickCount);
     		this.holopsiconUVAnimationState.startIfStopped(this.tickCount);
     	}

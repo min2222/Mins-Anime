@@ -7,8 +7,6 @@ import com.min01.minsanime.entity.living.EntityFrieren;
 import com.min01.minsanime.entity.living.EntityFrieren.LaserType;
 import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.misc.AnimeRenderType;
-import com.min01.minsanime.shader.AnimeShaders;
-import com.min01.minsanime.shader.ShaderEffectHandler;
 import com.min01.minsanime.util.AnimeClientUtil;
 import com.min01.minsanime.util.AnimeUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -33,9 +31,6 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 	public void render(EntityFrieren p_115455_, float p_115456_, float p_115457_, PoseStack p_115458_, MultiBufferSource p_115459_, int p_115460_)
 	{
 		super.render(p_115455_, p_115456_, p_115457_, p_115458_, p_115459_, p_115460_);
-		
-		ShaderEffectHandler.renderEffect(AnimeShaders.BLUR);
-		
 		new ArrayList<>(p_115455_.zoltraak).forEach(t -> 
 		{
 			p_115458_.pushPose();
@@ -57,7 +52,7 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 	        Vec3 end = t.getEndPos(p_115457_, p_115455_.level);
 	        end = end.yRot((float) Math.toRadians(rot.y - 180.0F)).xRot((float) Math.toRadians(-rot.x));
 	        end = new Vec3(end.x, -end.z, end.y);
-	        AnimeClientUtil.drawCurvedCylinder(p_115458_, p_115459_.getBuffer(AnimeRenderType.blur(new ResourceLocation(MinsAnime.MODID, "textures/effect/white.png"))), start, end, t.laserSize, t.distance, 32, 32, (float)color.x, (float)color.y, (float)color.z, 1.0F);
+	        AnimeClientUtil.drawCurvedCylinder(p_115458_, p_115459_.getBuffer(AnimeRenderType.zoltraak(new ResourceLocation(MinsAnime.MODID, "textures/effect/white.png"))), start, end, t.laserSize, t.distance, 32, 32, (float)color.x, (float)color.y, (float)color.z, 1.0F);
 			p_115458_.popPose();
 
 			p_115458_.pushPose();

@@ -203,7 +203,7 @@ public class ModelAltair extends HierarchicalModel<EntityAltair>
 		this.tommy_gun.visible = entity.getAnimationState() == 1;
 		this.animate(entity.idleAnimationState, AltairAnimation.ALTAIR_IDLE, ageInTicks);
 		this.animate(entity.idleAnimationState, AltairAnimation.ALTAIR_FLOATING, ageInTicks);
-		this.animate(entity.holopsiconAnimationState, AltairAnimation.ALTAIR_HOLOPSICON, ageInTicks);
+		entity.holopsiconAnimationState.animate(this, AltairAnimation.ALTAIR_HOLOPSICON, ageInTicks);
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package com.min01.minsanime.entity.model;
 
 import com.min01.minsanime.MinsAnime;
+import com.min01.minsanime.entity.animation.FrierenAnimation;
 import com.min01.minsanime.entity.living.EntityFrieren;
 import com.min01.minsanime.util.AnimeClientUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -23,9 +24,9 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(MinsAnime.MODID, "frieren"), "main");
 	private final ModelPart root;
 	private final ModelPart frieren_sama;
+	private final ModelPart upperbody;
 	private final ModelPart head;
 	private final ModelPart rightarm;
-	private final ModelPart staff;
 	private final ModelPart leftarm;
 	private final ModelPart rightleg;
 	private final ModelPart leftleg;
@@ -34,10 +35,10 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 	{
 		this.root = root.getChild("root");
 		this.frieren_sama = this.root.getChild("frieren_sama");
-		this.head = this.frieren_sama.getChild("head");
-		this.rightarm = this.frieren_sama.getChild("rightarm");
-		this.staff = this.rightarm.getChild("staff");
-		this.leftarm = this.frieren_sama.getChild("leftarm");
+		this.upperbody = this.frieren_sama.getChild("upperbody");
+		this.head = this.upperbody.getChild("head");
+		this.rightarm = this.upperbody.getChild("rightarm");
+		this.leftarm = this.upperbody.getChild("leftarm");
 		this.rightleg = this.frieren_sama.getChild("rightleg");
 		this.leftleg = this.frieren_sama.getChild("leftleg");
 	}
@@ -51,30 +52,10 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 
 		PartDefinition frieren_sama = root.addOrReplaceChild("frieren_sama", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-		PartDefinition head = frieren_sama.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 16).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, -24.0F, 0.0F));
+		PartDefinition upperbody = frieren_sama.addOrReplaceChild("upperbody", CubeListBuilder.create(), PartPose.offset(0.0F, -18.0F, 0.0F));
 
-		PartDefinition elf_ears = head.addOrReplaceChild("elf_ears", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, -2.0F, 0.0F, 0.1745F, 0.0F, 0.0F));
-
-		elf_ears.addOrReplaceChild("left_ear", CubeListBuilder.create().texOffs(18, 92).addBox(0.0F, -1.5F, 0.0F, 1.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(80, 90).addBox(0.0F, -1.5F, 2.0F, 1.0F, 2.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, -0.5F, 0.0F, 0.0F, 0.3927F, 0.0F));
-
-		elf_ears.addOrReplaceChild("right_ear", CubeListBuilder.create().texOffs(24, 92).addBox(-0.75F, -1.5F, 0.0F, 1.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
-		.texOffs(88, 91).addBox(-0.75F, -1.5F, 2.0F, 1.0F, 2.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.25F, -0.5F, 0.0F, 0.0F, -0.3927F, 0.0F));
-
-		elf_ears.addOrReplaceChild("earrings", CubeListBuilder.create().texOffs(24, 50).addBox(5.0F, 23.0F, -0.5F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(24, 53).addBox(-6.0F, 23.0F, -0.5F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -22.5F, 2.5F));
-
-		PartDefinition armorHead = head.addOrReplaceChild("armorHead", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
-
-		PartDefinition hair = armorHead.addOrReplaceChild("hair", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
-
-		hair.addOrReplaceChild("left_hair", CubeListBuilder.create().texOffs(32, 0).addBox(0.0F, -4.0F, 0.0F, 0.0F, 20.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(3.0F, -7.0F, 2.0F, 0.0873F, 1.1781F, 0.0F));
-
-		hair.addOrReplaceChild("right_hair", CubeListBuilder.create().texOffs(28, 32).addBox(0.0F, -4.0F, 0.0F, 0.0F, 20.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-3.0F, -7.0F, 2.0F, 0.0873F, -1.1781F, 0.0F));
-
-		PartDefinition body = frieren_sama.addOrReplaceChild("body", CubeListBuilder.create().texOffs(44, 42).addBox(-4.0F, -6.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
-		.texOffs(48, 0).addBox(-4.0F, -6.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, -18.0F, 0.0F));
+		PartDefinition body = upperbody.addOrReplaceChild("body", CubeListBuilder.create().texOffs(44, 42).addBox(-4.0F, -6.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(48, 0).addBox(-4.0F, -6.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
 		PartDefinition armorBody = body.addOrReplaceChild("armorBody", CubeListBuilder.create().texOffs(0, 32).addBox(-4.5F, -0.5F, -2.5F, 9.0F, 13.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -6.0F, 0.0F));
 
@@ -82,14 +63,21 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 
 		armorBody.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 50).addBox(-3.0F, -3.5F, -2.5F, 6.0F, 8.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-1.75F, 12.0F, -0.5F, 0.0F, 0.0F, 0.0436F));
 
-		PartDefinition rightarm = frieren_sama.addOrReplaceChild("rightarm", CubeListBuilder.create().texOffs(24, 60).addBox(-4.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 64).addBox(-4.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(-4.0F, -22.0F, 0.0F));
+		PartDefinition rightarm = upperbody.addOrReplaceChild("rightarm", CubeListBuilder.create().texOffs(24, 60).addBox(-4.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 64).addBox(-4.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(-4.0F, -4.0F, 0.0F));
 
 		rightarm.addOrReplaceChild("armorRightArm", CubeListBuilder.create().texOffs(84, 57).addBox(-4.5F, 6.0F, -2.5F, 5.0F, 3.0F, 5.0F, new CubeDeformation(0.0F))
 		.texOffs(16, 76).addBox(-4.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.0F))
 		.texOffs(80, 27).addBox(-4.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-		PartDefinition staff = rightarm.addOrReplaceChild("staff", CubeListBuilder.create(), PartPose.offsetAndRotation(-2.5F, 9.0F, 13.0F, 1.5708F, 0.0F, -1.5708F));
+		PartDefinition leftarm = upperbody.addOrReplaceChild("leftarm", CubeListBuilder.create().texOffs(68, 42).addBox(0.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
+		.texOffs(68, 58).addBox(0.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(4.0F, -4.0F, 0.0F));
+
+		leftarm.addOrReplaceChild("armorLeftArm", CubeListBuilder.create().texOffs(84, 65).addBox(-12.5F, 6.0F, -2.5F, 5.0F, 3.0F, 5.0F, new CubeDeformation(0.0F))
+		.texOffs(84, 37).addBox(-12.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.0F))
+		.texOffs(84, 47).addBox(-12.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.25F)), PartPose.offset(12.0F, 0.0F, 0.0F));
+
+		PartDefinition staff = leftarm.addOrReplaceChild("staff", CubeListBuilder.create(), PartPose.offsetAndRotation(2.5F, 9.0F, 13.0F, 1.5708F, 0.0F, -1.5708F));
 
 		PartDefinition handle = staff.addOrReplaceChild("handle", CubeListBuilder.create().texOffs(0, 80).addBox(-1.5F, 3.0F, -1.5F, 3.0F, 3.0F, 3.0F, new CubeDeformation(0.0F))
 		.texOffs(88, 86).addBox(-1.5F, -22.0F, -1.5F, 3.0F, 2.0F, 3.0F, new CubeDeformation(0.0F))
@@ -126,12 +114,27 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 
 		headpart.addOrReplaceChild("ribbon", CubeListBuilder.create().texOffs(16, 64).addBox(0.0F, 1.0F, -4.0F, 4.0F, 12.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-6.0F, 4.0F, 2.0F, -0.0436F, 0.0F, 0.0F));
 
-		PartDefinition leftarm = frieren_sama.addOrReplaceChild("leftarm", CubeListBuilder.create().texOffs(68, 42).addBox(0.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
-		.texOffs(68, 58).addBox(0.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(4.0F, -22.0F, 0.0F));
+		PartDefinition head = upperbody.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F))
+		.texOffs(0, 16).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, -6.0F, 0.0F));
 
-		leftarm.addOrReplaceChild("armorLeftArm", CubeListBuilder.create().texOffs(84, 65).addBox(-12.5F, 6.0F, -2.5F, 5.0F, 3.0F, 5.0F, new CubeDeformation(0.0F))
-		.texOffs(84, 37).addBox(-12.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.0F))
-		.texOffs(84, 47).addBox(-12.5F, -2.5F, -2.5F, 5.0F, 5.0F, 5.0F, new CubeDeformation(0.25F)), PartPose.offset(12.0F, 0.0F, 0.0F));
+		PartDefinition elf_ears = head.addOrReplaceChild("elf_ears", CubeListBuilder.create(), PartPose.offsetAndRotation(0.0F, -2.0F, 0.0F, 0.1745F, 0.0F, 0.0F));
+
+		elf_ears.addOrReplaceChild("left_ear", CubeListBuilder.create().texOffs(18, 92).addBox(0.0F, -1.5F, 0.0F, 1.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
+		.texOffs(80, 90).addBox(0.0F, -1.5F, 2.0F, 1.0F, 2.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(4.0F, -0.5F, 0.0F, 0.0F, 0.3927F, 0.0F));
+
+		elf_ears.addOrReplaceChild("right_ear", CubeListBuilder.create().texOffs(24, 92).addBox(-0.75F, -1.5F, 0.0F, 1.0F, 3.0F, 2.0F, new CubeDeformation(0.0F))
+		.texOffs(88, 91).addBox(-0.75F, -1.5F, 2.0F, 1.0F, 2.0F, 3.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-4.25F, -0.5F, 0.0F, 0.0F, -0.3927F, 0.0F));
+
+		elf_ears.addOrReplaceChild("earrings", CubeListBuilder.create().texOffs(24, 50).addBox(5.0F, 23.0F, -0.5F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
+		.texOffs(24, 53).addBox(-6.0F, 23.0F, -0.5F, 1.0F, 2.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -22.5F, 2.5F));
+
+		PartDefinition armorHead = head.addOrReplaceChild("armorHead", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		PartDefinition hair = armorHead.addOrReplaceChild("hair", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+		hair.addOrReplaceChild("left_hair", CubeListBuilder.create().texOffs(32, 0).addBox(0.0F, -4.0F, 0.0F, 0.0F, 20.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(3.0F, -7.0F, 2.0F, 0.0873F, 1.1781F, 0.0F));
+
+		hair.addOrReplaceChild("right_hair", CubeListBuilder.create().texOffs(28, 32).addBox(0.0F, -4.0F, 0.0F, 0.0F, 20.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-3.0F, -7.0F, 2.0F, 0.0873F, -1.1781F, 0.0F));
 
 		PartDefinition rightleg = frieren_sama.addOrReplaceChild("rightleg", CubeListBuilder.create().texOffs(40, 72).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(-2.0F, -12.0F, 0.0F));
 
@@ -150,12 +153,18 @@ public class ModelFrieren extends HierarchicalModel<EntityFrieren>
 	public void setupAnim(EntityFrieren entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) 
 	{
 		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.staff.visible = true;
-		this.leftarm.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
-        this.rightarm.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+		if(!entity.isUsingSkill() && !entity.isFlying())
+		{
+			this.leftarm.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
+	        this.rightarm.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+		}
 		this.rightleg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
         this.leftleg.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
 		AnimeClientUtil.animateHead(this.head, netHeadYaw, headPitch);
+		entity.zoltraakAnimationState.animate(this, FrierenAnimation.FRIEREN_ZOLTRAAK, ageInTicks);
+		entity.flyStartAnimationState.animate(this, FrierenAnimation.FRIEREN_FLY_START, ageInTicks);
+		entity.flyLoopAnimationState.animate(this, FrierenAnimation.FRIEREN_FLY_LOOP, ageInTicks);
+		entity.flyEndAnimationState.animate(this, FrierenAnimation.FRIEREN_FLY_END, ageInTicks);
 	}
 	
 	@Override

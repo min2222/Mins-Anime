@@ -3,54 +3,44 @@ package com.min01.minsanime.entity.ai.control;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class FlyingMoveControl extends MoveControl
+public class FlyingMoveControl extends MoveControl 
 {
-	private final Mob mob;
-    private int floatDuration;
+	public FlyingMoveControl(Mob mob)
+	{
+		super(mob);
+	}
 
-    public FlyingMoveControl(Mob mob) 
-    {
-    	super(mob);
-    	this.mob = mob;
-    }
-
-    @Override
-    public void tick() 
-    {
-    	if(this.operation == MoveControl.Operation.MOVE_TO) 
-    	{
-    		if(this.floatDuration-- <= 0) 
-    		{
-    			this.floatDuration += this.mob.getRandom().nextInt(5) + 2;
-    			Vec3 vec3 = new Vec3(this.wantedX - this.mob.getX(), this.wantedY - this.mob.getY(), this.wantedZ - this.mob.getZ());
-    			double d0 = vec3.length();
-    			vec3 = vec3.normalize();
-    			if(this.canReach(vec3, Mth.ceil(d0)))
-    			{
-    				this.mob.setDeltaMovement(this.mob.getDeltaMovement().add(vec3.scale(0.1D)));
-    			} 
-    			else 
-    			{
-    				this.operation = MoveControl.Operation.WAIT;
-    			}
-    		}
-    	}
-    }
-
-    private boolean canReach(Vec3 p_32771_, int p_32772_) 
-    {
-    	AABB aabb = this.mob.getBoundingBox();
-    	for(int i = 1; i < p_32772_; ++i)
-    	{
-    		aabb = aabb.move(p_32771_);
-    		if(!this.mob.level.noCollision(this.mob, aabb))
-    		{
-    			return false;
-    		}
-    	}
-    	return true;
-    }
+	@Override
+	public void tick()
+	{
+		if(this.operation == MoveControl.Operation.MOVE_TO)
+		{
+			Vec3 vec3 = new Vec3(this.wantedX - this.mob.getX(), this.wantedY - this.mob.getY(), this.wantedZ - this.mob.getZ());
+			double d0 = vec3.length();	
+			if(d0 < this.mob.getBoundingBox().getSize())
+			{
+				this.operation = MoveControl.Operation.WAIT;
+				this.mob.setDeltaMovement(this.mob.getDeltaMovement().scale(0.5D));
+			} 
+			else
+			{
+				this.mob.setDeltaMovement(this.mob.getDeltaMovement().add(vec3.scale(this.speedModifier * 0.05D / d0)));
+				if(this.mob.getTarget() == null) 
+				{
+					Vec3 vec31 = this.mob.getDeltaMovement();
+					this.mob.setYRot(-((float) Mth.atan2(vec31.x, vec31.z)) * (180F / (float) Math.PI));
+					this.mob.yBodyRot = this.mob.getYRot();
+				} 
+				else
+				{
+					double d2 = this.mob.getTarget().getX() - this.mob.getX();
+					double d1 = this.mob.getTarget().getZ() - this.mob.getZ();
+					this.mob.setYRot(-((float) Mth.atan2(d2, d1)) * (180F / (float) Math.PI));
+					this.mob.yBodyRot = this.mob.getYRot();
+				}
+			}
+		}
+	}
 }
