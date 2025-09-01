@@ -27,14 +27,6 @@ public class ClientEventHandler
 	public static void onFMLClientSetup(FMLClientSetupEvent event)
 	{
 		MinecraftForge.EVENT_BUS.register(ObjModelManager.getInstance());
-		/*try
-		{
-		    AnimeUtil.encryptFiles("2103yt984298yg", "@N(*@)$9gj9g", ".png");
-		}
-		catch (Exception e) 
-		{
-		    e.printStackTrace();
-		}*/
 	}
     
 	@SubscribeEvent

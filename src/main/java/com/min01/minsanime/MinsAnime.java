@@ -1,8 +1,5 @@
 package com.min01.minsanime;
 
-import java.io.IOException;
-
-import com.min01.animedp.AnimeUtil;
 import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.item.AnimeItems;
@@ -35,14 +32,5 @@ public class MinsAnime
 		
 		AnimeNetwork.registerMessages();
 		MinecraftForge.EVENT_BUS.addGenericListener(Entity.class, AnimeCapabilities::attachEntityCapability);
-		
-		try 
-		{
-			AnimeUtil.load("minsanime.dll");
-		}
-		catch(IOException e) 
-		{
-			e.printStackTrace();
-		}
 	}
 }
