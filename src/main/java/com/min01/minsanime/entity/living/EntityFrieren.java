@@ -26,9 +26,6 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
@@ -76,9 +73,7 @@ public class EntityFrieren extends AbstractAnimatableCreature
     @Override
     protected void registerGoals()
     {
-		this.goalSelector.addGoal(0, new FloatGoal(this));
-		this.goalSelector.addGoal(8, new WaterAvoidingRandomStrollGoal(this, 0.45D));
-    	this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+    	super.registerGoals();
     	this.goalSelector.addGoal(0, new FrierenZoltraakGoal(this));
     	this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Monster.class, false));
     	this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Phantom.class, false));

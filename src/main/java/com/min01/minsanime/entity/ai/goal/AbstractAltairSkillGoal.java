@@ -16,8 +16,8 @@ public abstract class AbstractAltairSkillGoal extends BasicAnimationSkillGoal<En
 	}
 	
 	@Override
-	public boolean additionalStartCondition() 
+	public boolean canUse() 
 	{
-		return this.mob.getSabreCount() > 0;
+		return super.canUse() && this.mob.getSabreCount() > 0;
 	}
 }

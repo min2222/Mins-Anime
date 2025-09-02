@@ -10,9 +10,9 @@ public class AltairSummonSabreGoal extends AbstractAltairSkillGoal
 	}
 	
 	@Override
-	public boolean additionalStartCondition()
+	public boolean canUse()
 	{
-		return this.mob.getSabreCount() < EntityAltair.MAX_SABRE_NUMBER - 1;
+		return super.canUse() && this.mob.getSabreCount() < EntityAltair.MAX_SABRE_NUMBER - 1;
 	}
 
 	@Override
