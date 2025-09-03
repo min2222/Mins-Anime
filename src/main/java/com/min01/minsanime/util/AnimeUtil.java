@@ -15,15 +15,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.LevelEntityGetter;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
@@ -47,29 +42,6 @@ public class AnimeUtil
 
         return blockpos;
     }
-    
-	//vanilla copy
-	public static BlockHitResult clip(Level level, ClipContext p_45548_)
-	{
-		return BlockGetter.traverseBlocks(p_45548_.getFrom(), p_45548_.getTo(), p_45548_, (p_151359_, p_151360_) -> 
-		{
-			BlockState blockstate = level.getBlockState(p_151360_);
-			FluidState fluidstate = level.getFluidState(p_151360_);
-			Vec3 vec3 = p_151359_.getFrom();
-			Vec3 vec31 = p_151359_.getTo();
-			VoxelShape voxelshape = p_151359_.getBlockShape(blockstate, level, p_151360_);
-			BlockHitResult blockhitresult = level.clipWithInteractionOverride(vec3, vec31, p_151360_, voxelshape, blockstate);
-			VoxelShape voxelshape1 = p_151359_.getFluidShape(fluidstate, level, p_151360_);
-			BlockHitResult blockhitresult1 = voxelshape1.clip(vec3, vec31, p_151360_);
-			double d0 = blockhitresult == null ? Double.MAX_VALUE : p_151359_.getFrom().distanceToSqr(blockhitresult.getLocation());
-			double d1 = blockhitresult1 == null ? Double.MAX_VALUE : p_151359_.getFrom().distanceToSqr(blockhitresult1.getLocation());
-			return d0 <= d1 ? blockhitresult : blockhitresult1;
-		}, (p_275153_) ->
-		{
-			Vec3 vec3 = p_275153_.getFrom().subtract(p_275153_.getTo());
-			return BlockHitResult.miss(p_275153_.getTo(), Direction.getNearest(vec3.x, vec3.y, vec3.z), BlockPos.containing(p_275153_.getTo()));
-		});
-	}
 	
 	public static Entity getOwner(Entity entity)
 	{

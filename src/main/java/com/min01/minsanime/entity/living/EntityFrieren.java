@@ -14,6 +14,7 @@ import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -105,7 +106,7 @@ public class EntityFrieren extends AbstractAnimatableCreature
     		{
         		this.getLookControl().setLookAt(this.getTarget(), 30.0F, 30.0F);
     		}
-    		if(this.canMove())
+    		if(this.canMove() && this.distanceTo(this.getTarget()) >= 8.0F)
     		{
 				if(this.isFlying())
 				{
@@ -120,17 +121,17 @@ public class EntityFrieren extends AbstractAnimatableCreature
 			if(!this.isUsingSkill())
 			{
 				BlockPos groundPos = AnimeUtil.getGroundPos(this.level, this.getTarget().getX(), this.getTarget().getY(), this.getTarget().getZ());
-				if(this.getTarget().getY() <= groundPos.getY() + 5 && this.isFlying())
+				if(this.getTarget().getY() <= groundPos.getY() + 3 && this.isFlying())
 				{
-					if(this.getAnimationState() == 0)
+					if(this.getAnimationState() != 3)
 					{
 						this.setAnimationState(3);
 						this.setAnimationTick(20);
 					}
 				}				
-				if(this.getTarget().getY() > groundPos.getY() + 5 && !this.isFlying())
+				if(this.getTarget().getY() > groundPos.getY() + 3 && !this.isFlying())
 				{
-					if(this.getAnimationState() == 0)
+					if(this.getAnimationState() != 2)
 					{
 						this.setAnimationState(2);
 						this.setAnimationTick(20);
@@ -164,6 +165,20 @@ public class EntityFrieren extends AbstractAnimatableCreature
 		Laser laser = new Laser(pos, rot, this, target, type);
 		this.zoltraak.add(laser);
 		AnimeNetwork.sendToAll(new UpdateZoltraakPacket(this, laser));
+    }
+    
+    @Override
+    public void addAdditionalSaveData(CompoundTag p_21484_) 
+    {
+    	super.addAdditionalSaveData(p_21484_);
+    	p_21484_.putBoolean("isFlying", this.isFlying());
+    }
+    
+    @Override
+    public void readAdditionalSaveData(CompoundTag p_21450_)
+    {
+    	super.readAdditionalSaveData(p_21450_);
+    	this.setFlying(p_21450_.getBoolean("isFlying"));
     }
     
     public void switchControl(boolean isFlying)

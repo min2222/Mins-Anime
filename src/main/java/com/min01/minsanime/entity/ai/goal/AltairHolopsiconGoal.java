@@ -1,6 +1,7 @@
 package com.min01.minsanime.entity.ai.goal;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
 
 import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.entity.living.EntityAltair;
@@ -31,8 +32,8 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 		{
 			this.movement = HolopsiconMovement.NO13;
 		}
-		List<MobEffectInstance> list = this.mob.getActiveEffects().stream().filter(t -> t.getEffect().getCategory().equals(MobEffectCategory.HARMFUL)).toList();
-		if(this.mob.getHurt() > 0.0F || !list.isEmpty())
+		Optional<MobEffectInstance> optional = new ArrayList<>(this.mob.getActiveEffects()).stream().filter(t -> t.getEffect().getCategory().equals(MobEffectCategory.HARMFUL)).findAny();
+		if(this.mob.getTotalDamage() > 0.0F || optional.isPresent())
 		{
 			this.movement = HolopsiconMovement.NO14;
 		}
@@ -63,14 +64,16 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 				this.mob.level.addFreshEntity(entity);
 				break;
 			case NO14:
-				this.mob.getTarget().setHealth(this.mob.getTarget().getHealth() - this.mob.getHurt());
-				this.mob.setHealth(this.mob.getHealth() + this.mob.getHurt());
-				this.mob.setHurt(0.0F);
-				List<MobEffectInstance> list = this.mob.getActiveEffects().stream().filter(t -> t.getEffect().getCategory().equals(MobEffectCategory.HARMFUL)).toList();
-				list.forEach(t -> 
+				this.mob.getTarget().setHealth(this.mob.getTarget().getHealth() - this.mob.getTotalDamage());
+				this.mob.setHealth(this.mob.getHealth() + this.mob.getTotalDamage());
+				this.mob.setTotalDamage(0.0F);
+				new ArrayList<>(this.mob.getActiveEffects()).forEach(t -> 
 				{
-					this.mob.getTarget().addEffect(t);
-					this.mob.removeEffect(t.getEffect());
+					if(t.getEffect().getCategory().equals(MobEffectCategory.HARMFUL))
+					{
+						this.mob.getTarget().addEffect(t);
+						this.mob.removeEffect(t.getEffect());
+					}
 				});
 				break;
 			case NO13:

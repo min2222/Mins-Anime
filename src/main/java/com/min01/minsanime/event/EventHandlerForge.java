@@ -1,9 +1,11 @@
 package com.min01.minsanime.event;
 
 import com.min01.minsanime.MinsAnime;
+import com.min01.minsanime.misc.AnimeSecurityManager;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +13,12 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = MinsAnime.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class EventHandlerForge
 {
+	@SubscribeEvent
+	public static void onEntityJoinLevel(EntityJoinLevelEvent event)
+	{
+		AnimeSecurityManager.addEntities(event.getEntity());
+	}
+	
 	@SubscribeEvent
 	public static void onLivingTick(LivingTickEvent event)
 	{

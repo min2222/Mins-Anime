@@ -20,5 +20,6 @@ public class AnimeCreativeTabs
     		.displayItems((enabledFeatures, output) -> 
     		{
     			output.accept(AnimeItems.FRIEREN_SPAWN_EGG.get());
+    			output.accept(AnimeItems.ALTAIR_SPAWN_EGG.get());
     		}).build());
 }

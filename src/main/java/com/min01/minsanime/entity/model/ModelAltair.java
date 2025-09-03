@@ -17,6 +17,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class ModelAltair extends HierarchicalModel<EntityAltair>
 {
@@ -28,6 +29,8 @@ public class ModelAltair extends HierarchicalModel<EntityAltair>
 	private final ModelPart sabre;
 	private final ModelPart left_arm;
 	private final ModelPart tommy_gun;
+	private final ModelPart right_leg;
+	private final ModelPart left_leg;
 
 	public ModelAltair(ModelPart root) 
 	{
@@ -38,6 +41,8 @@ public class ModelAltair extends HierarchicalModel<EntityAltair>
 		this.sabre = this.right_arm.getChild("sabre");
 		this.left_arm = this.Altair.getChild("left_arm");
 		this.tommy_gun = this.left_arm.getChild("tommy_gun");
+		this.right_leg = this.Altair.getChild("right_leg");
+		this.left_leg = this.Altair.getChild("left_leg");
 	}
 
 	public static LayerDefinition createBodyLayer()
@@ -198,11 +203,23 @@ public class ModelAltair extends HierarchicalModel<EntityAltair>
 	public void setupAnim(EntityAltair entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) 
 	{
 		this.root().getAllParts().forEach(ModelPart::resetPose);
+		if(!entity.isFlying())
+		{
+			this.right_leg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
+	        this.left_leg.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+	        
+	        if(!entity.isUsingSkill())
+	        {
+				this.left_arm.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
+		        this.right_arm.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
+	        }
+		}
+		
 		AnimeClientUtil.animateHead(this.head, netHeadYaw, headPitch);
 		this.sabre.visible = entity.getAnimationState() == 1;
 		this.tommy_gun.visible = entity.getAnimationState() == 1;
-		this.animate(entity.idleAnimationState, AltairAnimation.ALTAIR_IDLE, ageInTicks);
-		this.animate(entity.idleAnimationState, AltairAnimation.ALTAIR_FLOATING, ageInTicks);
+		entity.idleAnimationState.animate(this, AltairAnimation.ALTAIR_IDLE, ageInTicks, limbSwingAmount);
+		entity.floatingAnimationState.animate(this, AltairAnimation.ALTAIR_FLOATING, ageInTicks, limbSwingAmount);
 		entity.holopsiconAnimationState.animate(this, AltairAnimation.ALTAIR_HOLOPSICON, ageInTicks);
 	}
 	

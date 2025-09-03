@@ -29,6 +29,7 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 public class EntityAltairSabre extends ThrowableProjectile
 {
 	public static final EntityDataAccessor<Boolean> IS_HOMING = SynchedEntityData.defineId(EntityAltairSabre.class, EntityDataSerializers.BOOLEAN);
+	
 	public EntityAltairSabre(EntityType<? extends ThrowableProjectile> p_36721_, Level p_36722_)
 	{
 		super(p_36721_, p_36722_);
@@ -57,10 +58,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 	public void readAdditionalSaveData(CompoundTag p_36761_) 
 	{
 		super.readAdditionalSaveData(p_36761_);
-		if(p_36761_.contains("isHoming"))
-		{
-			this.setHoming(p_36761_.getBoolean("isHoming"));
-		}
+		this.setHoming(p_36761_.getBoolean("isHoming"));
 	}
 	
 	@Override
@@ -73,7 +71,7 @@ public class EntityAltairSabre extends ThrowableProjectile
 			{
 				Mob owner = (Mob) this.getOwner();
 				Entity target = owner.getTarget();
-				if(target != null)
+				if(target != null && target.isAlive())
 				{
 			    	this.lookAt(Anchor.EYES, target.getEyePosition());
 			    	this.shootFromRotation(owner, -this.getXRot(), -this.getYRot(), 0.0F, 1.5F, 1.0F);

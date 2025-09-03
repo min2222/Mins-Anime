@@ -2,11 +2,17 @@ package com.min01.minsanime.entity.ai.goal;
 
 import com.min01.minsanime.entity.living.EntityAltair;
 
-public class AltairSummonSabreGoal extends AbstractAltairSkillGoal
+public class AltairSummonSabreGoal extends BasicAnimationSkillGoal<EntityAltair>
 {
 	public AltairSummonSabreGoal(EntityAltair mob) 
 	{
 		super(mob);
+	}
+	
+	@Override
+	public boolean stopMovingWhenStart()
+	{
+		return false;
 	}
 	
 	@Override
