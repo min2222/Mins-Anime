@@ -13,6 +13,7 @@ import com.min01.minsanime.network.UpdateZoltraakPacket;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -118,15 +119,16 @@ public class EntityFrieren extends AbstractAnimatableCreature
     		}
 			if(!this.isUsingSkill())
 			{
-				if(this.getTarget().onGround() && this.getTarget().getY() <= this.getY() && this.isFlying())
+				BlockPos groundPos = AnimeUtil.getGroundPos(this.level, this.getTarget().getX(), this.getTarget().getY(), this.getTarget().getZ());
+				if(this.getTarget().getY() <= groundPos.getY() + 5 && this.isFlying())
 				{
 					if(this.getAnimationState() == 0)
 					{
 						this.setAnimationState(3);
 						this.setAnimationTick(20);
 					}
-				}
-				if(!this.getTarget().onGround() && this.onGround() && !this.isFlying())
+				}				
+				if(this.getTarget().getY() > groundPos.getY() + 5 && !this.isFlying())
 				{
 					if(this.getAnimationState() == 0)
 					{

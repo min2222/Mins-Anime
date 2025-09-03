@@ -33,6 +33,21 @@ public class AnimeUtil
 {
 	public static final Method GET_ENTITY = ObfuscationReflectionHelper.findMethod(Level.class, "m_142646_");
 	
+    @SuppressWarnings("deprecation")
+	public static BlockPos getGroundPos(BlockGetter pLevel, double pX, double startY, double pZ)
+    {
+        BlockPos.MutableBlockPos blockpos$mutable = new BlockPos.MutableBlockPos(pX, startY, pZ);
+        do
+        {
+        	blockpos$mutable.move(Direction.DOWN);
+        }
+        while((pLevel.getBlockState(blockpos$mutable).isAir() || pLevel.getBlockState(blockpos$mutable).liquid() || !pLevel.getBlockState(blockpos$mutable).isCollisionShapeFullBlock(pLevel, blockpos$mutable)) && blockpos$mutable.getY() > pLevel.getMinBuildHeight());
+
+        BlockPos blockpos = blockpos$mutable.below();
+
+        return blockpos;
+    }
+    
 	//vanilla copy
 	public static BlockHitResult clip(Level level, ClipContext p_45548_)
 	{
