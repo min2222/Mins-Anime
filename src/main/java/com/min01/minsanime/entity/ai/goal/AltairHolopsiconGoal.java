@@ -3,7 +3,6 @@ package com.min01.minsanime.entity.ai.goal;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.entity.living.EntityAltair;
 import com.min01.minsanime.entity.living.EntityAltair.HolopsiconMovement;
 import com.min01.minsanime.sound.AnimeSounds;
@@ -54,7 +53,7 @@ public class AltairHolopsiconGoal extends AbstractAltairSkillGoal
 			{
 			case NO20:
 				Entity entity = this.mob.getTarget().getType().create(this.mob.level);
-				entity.getCapability(AnimeCapabilities.OWNER).ifPresent(t -> t.setOwner(this.mob));
+				AnimeUtil.setOwner(entity, this.mob);
 				entity.setPos(AnimeUtil.getGroundPosAbove(this.mob.level, this.mob.getX(), this.mob.getY(), this.mob.getZ()));
 				if(entity instanceof Mob mob)
 				{

@@ -19,6 +19,7 @@ public class AnimeItems
 	
 	public static final RegistryObject<Item> ALTAIR_SPAWN_EGG = registerSpawnEgg("altair_spawn_egg", () -> AnimeEntities.ALTAIR.get(), 3026486, 12958088);
 	public static final RegistryObject<Item> FRIEREN_SPAWN_EGG = registerSpawnEgg("frieren_spawn_egg", () -> AnimeEntities.FRIEREN.get(), 16514043, 12422219);
+	public static final RegistryObject<Item> ESDEATH_SPAWN_EGG = registerSpawnEgg("esdeath_spawn_egg", () -> AnimeEntities.ESDEATH.get(), 14343647, 9085884);
 	
 	public static <T extends Mob> RegistryObject<Item> registerSpawnEgg(String name, Supplier<EntityType<T>> entity, int color1, int color2) 
 	{

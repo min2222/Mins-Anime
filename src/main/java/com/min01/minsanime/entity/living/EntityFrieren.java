@@ -343,21 +343,15 @@ public class EntityFrieren extends AbstractAnimatableCreature
     	        	{
     					List<LivingEntity> arrayList = new ArrayList<>();
     		        	Vec3 startPos = this.position;
-    					Vec3 endPos = AnimeUtil.getLookPos(this.rotation, this.position, 0.0F, 0.0F, this.distance);
+    					Vec3 endPos = AnimeUtil.getLookPos(this.rotation, startPos, 0.0F, 0.0F, this.distance);
     					HitResult hitResult = level.clip(new ClipContext(startPos, endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, owner));
     		        	Vec3 hitPos = hitResult.getLocation();
     		            Vec3 targetPos = hitPos.subtract(startPos).normalize();
-    		            for(int i = 1; i < (float) startPos.distanceTo(hitPos); ++i)
+    		            for(int i = 1; i < Math.floor(startPos.distanceTo(hitPos)); ++i)
     		            {
     		            	Vec3 rayPos = startPos.add(targetPos.scale(i));
     		            	List<LivingEntity> list = level.getEntitiesOfClass(LivingEntity.class, new AABB(rayPos, rayPos).inflate(this.laserMaxSize), t -> t != owner && !t.isAlliedTo(owner));
-    		            	list.forEach(t -> 
-    		            	{
-    		            		if(!arrayList.contains(t))
-    		            		{
-    		            			arrayList.add(t);
-    		            		}
-    		            	});
+    		            	arrayList.addAll(list);
     		            }
     		            arrayList.forEach(t -> 
     		            {

@@ -1,5 +1,6 @@
 package com.min01.minsanime.network;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -8,15 +9,14 @@ import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 public class UpdateOwnerCapabilityPacket 
 {
 	private final UUID entityUUID;
-	private final UUID ownerUUID;
+	private final Optional<UUID> ownerUUID;
 	
-	public UpdateOwnerCapabilityPacket(UUID entityUUID, UUID ownerUUID) 
+	public UpdateOwnerCapabilityPacket(UUID entityUUID, Optional<UUID> ownerUUID) 
 	{
 		this.entityUUID = entityUUID;
 		this.ownerUUID = ownerUUID;
@@ -25,13 +25,13 @@ public class UpdateOwnerCapabilityPacket
 	public UpdateOwnerCapabilityPacket(FriendlyByteBuf buf)
 	{
 		this.entityUUID = buf.readUUID();
-		this.ownerUUID = buf.readUUID();
+		this.ownerUUID = buf.readOptional(t -> t.readUUID());
 	}
 
 	public void encode(FriendlyByteBuf buf)
 	{
 		buf.writeUUID(this.entityUUID);
-		buf.writeUUID(this.ownerUUID);
+		buf.writeOptional(this.ownerUUID, (t, u) -> t.writeUUID(u));
 	}
 	
 	public static class Handler 
@@ -45,17 +45,18 @@ public class UpdateOwnerCapabilityPacket
 					AnimeUtil.getClientLevel(level -> 
 					{
 						Entity entity = AnimeUtil.getEntityByUUID(level, message.entityUUID);
-						if(entity instanceof LivingEntity living) 
+						entity.getCapability(AnimeCapabilities.OWNER).ifPresent(cap -> 
 						{
-							living.getCapability(AnimeCapabilities.OWNER).ifPresent(cap -> 
+							if(message.ownerUUID.isPresent())
 							{
-								Entity owner = AnimeUtil.getEntityByUUID(living.level, message.ownerUUID);
-								if(owner instanceof LivingEntity livingOwner)
-								{
-									cap.setOwner(livingOwner);
-								}
-							});
-						}
+								Entity owner = AnimeUtil.getEntityByUUID(level, message.ownerUUID.get());
+								cap.setOwner(owner);
+							}
+							else
+							{
+								cap.setOwner(null);
+							}
+						});
 					});
 				}
 			});

@@ -17,11 +17,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.phys.AABB;
@@ -32,26 +30,6 @@ public class AnimeClientUtil
 	public static final Minecraft MC = Minecraft.getInstance();
 	
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
-	
-    public static void renderFlatQuad(PoseStack stack, VertexConsumer consumer, float size, int packedLightIn) 
-    {
-        float minU = 0;
-        float minV = 0;
-        float maxU = 1;
-        float maxV = 1;
-        PoseStack.Pose matrixstack$entry = stack.last();
-        Matrix4f matrix4f = matrixstack$entry.pose();
-        Matrix3f matrix3f = matrixstack$entry.normal();
-        drawVertex(matrix4f, matrix3f, consumer, size, size, 0, minU, minV, 1.0F, packedLightIn);
-        drawVertex(matrix4f, matrix3f, consumer, size, -size, 0, minU, maxV, 1.0F, packedLightIn);
-        drawVertex(matrix4f, matrix3f, consumer, -size, -size, 0, maxU, maxV, 1.0F, packedLightIn);
-        drawVertex(matrix4f, matrix3f, consumer, -size, size, 0, maxU, minV, 1.0F, packedLightIn);
-    }
-    
-    public static void drawVertex(Matrix4f matrix, Matrix3f normals, VertexConsumer vertexBuilder, float offsetX, float offsetY, float offsetZ, float textureX, float textureY, float alpha, int packedLightIn)
-    {
-    	vertexBuilder.vertex(matrix, offsetX, offsetY, offsetZ).color(1, 1, 1, 1 * alpha).uv(textureX, textureY).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
-    }
 	
 	public static void resetPose(WavefrontObject obj)
 	{
@@ -104,24 +82,16 @@ public class AnimeClientUtil
 		head.yRot += Math.toRadians(netHeadYaw);
 		head.xRot += Math.toRadians(headPitch);
 	}
-	
-    public static void drawBox(AABB boundingBox, PoseStack stack, MultiBufferSource bufferIn, Vec3 rgb, int alpha) 
-    {
-    	drawBox(boundingBox, stack, bufferIn, rgb, LightTexture.FULL_BLOCK, alpha, RenderType.entityCutoutNoCull(new ResourceLocation("textures/block/ice.png")));
-    }
     
-    //ChatGPT ahh;
     public static void drawCurvedCylinder(PoseStack stack, VertexConsumer buffer, Vec3 start, Vec3 end, float radius, float curveHeight, int curveSteps, int circleSegments, float r, float g, float b, float a)
     {
         Matrix4f matrix = stack.last().pose();
 
-        // Control point for a curved path (simple quadratic bezier)
         Vec3 control = start.add(end).scale(0.1F).add(0, curveHeight / 2, 0);
 
         List<Vec3> curvePoints = new ArrayList<>();
         List<Vec3> tangents = new ArrayList<>();
 
-        // Generate curve points and tangents
         for(int i = 0; i <= curveSteps; i++) 
         {
             float t = i / (float) curveSteps;
@@ -131,12 +101,10 @@ public class AnimeClientUtil
             Vec3 point = p0.lerp(p1, t);
             curvePoints.add(point);
 
-            // Compute tangent using central difference if possible
             float dt = 1.0F / curveSteps;
             Vec3 tangent;
             if(i == 0)
             {
-                // Forward difference at start
                 float t1 = t + dt;
                 Vec3 p0b = start.lerp(control, t1);
                 Vec3 p1b = control.lerp(end, t1);
@@ -145,7 +113,6 @@ public class AnimeClientUtil
             }
             else if(i == curveSteps)
             {
-                // Backward difference at end
                 float t0 = t - dt;
                 Vec3 p0b = start.lerp(control, t0);
                 Vec3 p1b = control.lerp(end, t0);
@@ -154,7 +121,6 @@ public class AnimeClientUtil
             } 
             else 
             {
-                // Centered difference
                 float t0 = t - dt;
                 float t1 = t + dt;
                 Vec3 p0a = start.lerp(control, t0);
@@ -171,24 +137,20 @@ public class AnimeClientUtil
             tangents.add(tangent);
         }
 
-        // Draw dome at the start
         Vec3 startDir = curvePoints.get(1).subtract(curvePoints.get(0)).normalize();
         drawHemisphereCap(buffer, matrix, curvePoints.get(0), startDir.scale(-1), radius, circleSegments, r, g, b, a);
 
         List<Vec3> prevRing = null;
 
-        // Draw cylinder body
         for(int i = 0; i < curvePoints.size(); i++) 
         {
             Vec3 center = curvePoints.get(i);
             Vec3 tangent = tangents.get(i);
 
-            // Orthonormal basis
             Vec3 arbitrary = Math.abs(tangent.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
             Vec3 normal = tangent.cross(arbitrary).normalize();
             Vec3 binormal = tangent.cross(normal).normalize();
 
-            // Generate ring
             List<Vec3> ring = new ArrayList<>();
             for(int j = 0; j < circleSegments; j++) 
             {
@@ -206,7 +168,6 @@ public class AnimeClientUtil
                     Vec3 v2 = ring.get((j + 1) % circleSegments);
                     Vec3 v3 = ring.get(j);
 
-                    // Two triangles per quad
                     vertex(buffer, matrix, v0, r, g, b, a);
                     vertex(buffer, matrix, v1, r, g, b, a);
                     vertex(buffer, matrix, v2, r, g, b, a);
@@ -220,7 +181,6 @@ public class AnimeClientUtil
             prevRing = ring;
         }
 
-        // Draw dome at the end
         Vec3 endDir = curvePoints.get(curvePoints.size() - 1).subtract(curvePoints.get(curvePoints.size() - 2)).normalize();
         drawHemisphereCap(buffer, matrix, curvePoints.get(curvePoints.size() - 1), endDir, radius, circleSegments, r, g, b, a);
     }
@@ -231,7 +191,7 @@ public class AnimeClientUtil
         Vec3 normal = direction.cross(arbitrary).normalize();
         Vec3 binormal = direction.cross(normal).normalize();
 
-        int rings = segments / 2; // Half sphere
+        int rings = segments / 2;
 
         for(int i = 0; i < rings; i++) 
         {
@@ -253,13 +213,11 @@ public class AnimeClientUtil
                 Vec3 v10 = direction.scale(y2 * radius).add(normal.scale(r2 * radius * Math.cos(phi1)).add(binormal.scale(r2 * radius * Math.sin(phi1))));
                 Vec3 v11 = direction.scale(y2 * radius).add(normal.scale(r2 * radius * Math.cos(phi2)).add(binormal.scale(r2 * radius * Math.sin(phi2))));
 
-                // Translate all points to the center
                 v00 = v00.add(center);
                 v01 = v01.add(center);
                 v10 = v10.add(center);
                 v11 = v11.add(center);
 
-                // Two triangles
                 vertex(buffer, matrix, v00, r, g, b, a);
                 vertex(buffer, matrix, v01, r, g, b, a);
                 vertex(buffer, matrix, v11, r, g, b, a);
@@ -276,25 +234,21 @@ public class AnimeClientUtil
     	buffer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z).color(r, g, b, a).uv(0, 0).endVertex();
     }
     
-    //DeepSeek ahh;
     public static void drawCylinder(PoseStack stack, VertexConsumer buffer, float radius, float height, int segments, float r, float g, float b, float a)
     {
 		Matrix4f matrix = stack.last().pose();
 		float halfHeight = height / 2;
 		
-		// Draw side of cylinder
 		for(int i = 0; i <= segments; i++) 
 		{
 			float angle = (float) (2 * Math.PI * i / segments);
 			float x = radius * Mth.cos(angle);
 			float z = radius * Mth.sin(angle);
 			
-			// Add vertices for top and bottom edges
 			buffer.vertex(matrix, x, halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
 			buffer.vertex(matrix, x, -halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
 		}
 		
-		// Draw top cap
 		buffer.vertex(matrix, 0, halfHeight, 0).color(r, g, b, a).uv(0, 0).endVertex();
 		for(int i = 0; i <= segments; i++)
 		{
@@ -304,7 +258,6 @@ public class AnimeClientUtil
 			buffer.vertex(matrix, x, halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
 		}
 		
-		// Draw bottom cap
 		buffer.vertex(matrix, 0, -halfHeight, 0).color(r, g, b, a).uv(0, 0).endVertex();
 		for(int i = 0; i <= segments; i++)
 		{
@@ -315,9 +268,28 @@ public class AnimeClientUtil
 		}
     }
     
-    public static void drawBox(AABB boundingBox, PoseStack stack, MultiBufferSource bufferIn, Vec3 rgb, int light, int alpha, RenderType renderType) 
+    public static void drawQuad(PoseStack stack, VertexConsumer consumer, float size, int packedLightIn, float alpha) 
     {
-        VertexConsumer vertexbuffer = bufferIn.getBuffer(renderType);
+        float minU = 0;
+        float minV = 0;
+        float maxU = 1;
+        float maxV = 1;
+        PoseStack.Pose matrixstack$entry = stack.last();
+        Matrix4f matrix4f = matrixstack$entry.pose();
+        Matrix3f matrix3f = matrixstack$entry.normal();
+        drawVertex(matrix4f, matrix3f, consumer, size, size, 0, minU, minV, alpha, packedLightIn);
+        drawVertex(matrix4f, matrix3f, consumer, size, -size, 0, minU, maxV, alpha, packedLightIn);
+        drawVertex(matrix4f, matrix3f, consumer, -size, -size, 0, maxU, maxV, alpha, packedLightIn);
+        drawVertex(matrix4f, matrix3f, consumer, -size, size, 0, maxU, minV, alpha, packedLightIn);
+    }
+    
+    public static void drawVertex(Matrix4f matrix, Matrix3f normals, VertexConsumer vertexBuilder, float offsetX, float offsetY, float offsetZ, float textureX, float textureY, float alpha, int packedLightIn)
+    {
+    	vertexBuilder.vertex(matrix, offsetX, offsetY, offsetZ).color(1, 1, 1, 1 * alpha).uv(textureX, textureY).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(packedLightIn).normal(normals, 0.0F, 1.0F, 0.0F).endVertex();
+    }
+    
+    public static void drawBox(AABB boundingBox, PoseStack stack, VertexConsumer consumer, Vec3 rgb, int light, float alpha) 
+    {
         Matrix4f matrix4f = stack.last().pose();
         float maxX = (float) boundingBox.maxX * 0.625F;
         float minX = (float) boundingBox.minX * 0.625F;
@@ -331,16 +303,16 @@ public class AnimeClientUtil
         float minU = minZ - maxZ;
         float minV = minY - maxY;
         // X+
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(1.0F, 0.0F, 0F).endVertex();
 
         // X-
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(-1.0F, 0.0F, 0.0F).endVertex();
 
 
         maxU = maxX - minX;
@@ -348,16 +320,16 @@ public class AnimeClientUtil
         minU = minX - maxX;
         minV = minY - maxY;
         // Z-
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, -1.0F).endVertex();
 
         // Z+
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 0.0F, 1.0F).endVertex();
 
 
         maxU = maxZ - minZ;
@@ -365,15 +337,15 @@ public class AnimeClientUtil
         minU = minZ - maxZ;
         minV = minX - maxX;
         // Y+
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.maxY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, 1.0F, 0.0F).endVertex();
 
         // Y-
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
-        vertexbuffer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
+        consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
     }
 }

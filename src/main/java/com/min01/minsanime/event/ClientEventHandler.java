@@ -4,10 +4,14 @@ import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.model.ModelAltair;
 import com.min01.minsanime.entity.model.ModelAltairSabre;
+import com.min01.minsanime.entity.model.ModelEsdeath;
 import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.entity.renderer.AltairRenderer;
 import com.min01.minsanime.entity.renderer.AltairSabreRenderer;
+import com.min01.minsanime.entity.renderer.EsdeathRenderer;
 import com.min01.minsanime.entity.renderer.FrierenRenderer;
+import com.min01.minsanime.entity.renderer.IceRenderer;
+import com.min01.minsanime.entity.renderer.NoneRenderer;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.particle.AnimeParticles;
 import com.min01.minsanime.particle.SparkParticle;
@@ -41,6 +45,7 @@ public class ClientEventHandler
     	event.registerLayerDefinition(ModelAltair.LAYER_LOCATION, ModelAltair::createBodyLayer);
     	event.registerLayerDefinition(ModelAltairSabre.LAYER_LOCATION, ModelAltairSabre::createBodyLayer);
     	event.registerLayerDefinition(ModelFrieren.LAYER_LOCATION, ModelFrieren::createBodyLayer);
+    	event.registerLayerDefinition(ModelEsdeath.LAYER_LOCATION, ModelEsdeath::createBodyLayer);
     }
     
     @SubscribeEvent
@@ -49,5 +54,8 @@ public class ClientEventHandler
     	event.registerEntityRenderer(AnimeEntities.ALTAIR.get(), AltairRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.ALTAIR_SABRE.get(), AltairSabreRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.FRIEREN.get(), FrierenRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.ESDEATH.get(), EsdeathRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.ICE.get(), IceRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.CAMERA_SHAKE.get(), NoneRenderer::new);
     }
 }

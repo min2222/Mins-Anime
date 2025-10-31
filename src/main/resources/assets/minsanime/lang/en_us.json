@@ -1,8 +1,12 @@
 {
 	"itemGroup.minsanime": "Min's Anime",
+	"entity.minsanime.camera_shake": "Camera Shake",
 	"entity.minsanime.altair": "Altair",
 	"entity.minsanime.altair_sabre": "Altair's Sabre",
 	"entity.minsanime.frieren": "Frieren",
-	"item.minsanime.altair_spawn_egg": "Altair Spawn Egg",
-	"item.minsanime.frieren_spawn_egg": "Frieren Spawn Egg"
+	"entity.minsanime.esdeath": "Esdeath",
+	"entity.minsanime.ice": "Ice",
+	"item.minsanime.altair_spawn_egg": "Altair Spawn Egg (WIP, do not spawn)",
+	"item.minsanime.frieren_spawn_egg": "Frieren Spawn Egg (WIP, do not spawn)",
+	"item.minsanime.esdeath_spawn_egg": "Esdeath Spawn Egg (WIP)"
 }

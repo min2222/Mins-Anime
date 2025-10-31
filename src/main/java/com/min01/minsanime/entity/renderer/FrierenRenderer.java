@@ -57,7 +57,7 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 
 			p_115458_.pushPose();
 			p_115458_.mulPose(Axis.ZP.rotationDegrees(p_115455_.tickCount / 2));
-			AnimeClientUtil.renderFlatQuad(p_115458_, p_115459_.getBuffer(AnimeRenderType.eyesNoAlpha(new ResourceLocation(MinsAnime.MODID, "textures/effect/zoltraak.png"))), t.circleSize, LightTexture.FULL_BRIGHT);
+			AnimeClientUtil.drawQuad(p_115458_, p_115459_.getBuffer(AnimeRenderType.eyesNoAlpha(new ResourceLocation(MinsAnime.MODID, "textures/effect/zoltraak.png"))), t.circleSize, LightTexture.FULL_BRIGHT, 1.0F);
 			p_115458_.popPose();
 			
 			p_115458_.popPose();

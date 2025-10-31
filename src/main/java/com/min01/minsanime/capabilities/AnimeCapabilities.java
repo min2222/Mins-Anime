@@ -23,7 +23,6 @@ public class AnimeCapabilities
 			LazyOptional<IOwnerCapability> inst = LazyOptional.of(() -> 
 			{
 				OwnerCapabilityImpl i = new OwnerCapabilityImpl();
-				i.setEntity(e.getObject());
 				return i;
 			});
 

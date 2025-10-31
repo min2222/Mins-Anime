@@ -1,6 +1,7 @@
 package com.min01.minsanime.util;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -8,18 +9,22 @@ import org.joml.Math;
 
 import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.capabilities.IOwnerCapability;
+import com.min01.minsanime.capabilities.OwnerCapabilityImpl;
+import com.min01.minsanime.entity.ai.goal.EsdeathIceBarrierGoal;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
@@ -27,6 +32,45 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 public class AnimeUtil 
 {
 	public static final Method GET_ENTITY = ObfuscationReflectionHelper.findMethod(Level.class, "m_142646_");
+	
+    public static void performCheck(Entity arrow, PathfinderMob mob)
+    {
+        if(!(arrow.level instanceof ServerLevel)) 
+        	return;
+        float width = arrow.getBbWidth() + 0.3F;
+        Vec3 arrowMotion = arrow.getDeltaMovement();
+        double vH = Math.sqrt(arrowMotion.x * arrowMotion.x + arrowMotion.z * arrowMotion.z);
+        Vec3 arrowDirection = new Vec3(arrowMotion.x / vH, arrowMotion.y / vH, arrowMotion.z / vH);
+        int rangeVertical = 16;
+        int rangeHorizontal = 24;
+        int distanceY = Math.abs((int) mob.position().y - (int) arrow.position().y);
+        if(distanceY <= rangeVertical) 
+        {
+            double distanceX = mob.position().x - arrow.position().x;
+            double distanceZ = mob.position().z - arrow.position().z;
+            double distanceH = Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
+            if(distanceH <= rangeHorizontal)
+            {
+                double cos = (arrowDirection.x * distanceX + arrowDirection.z * distanceZ) / distanceH;
+                double sin = Math.sqrt(1 - cos * cos);
+                if(width >= distanceH * sin)
+                {
+                	setDirection(mob, arrowDirection);
+                }
+            }
+        }
+    }
+    
+    public static void setDirection(PathfinderMob entity, Vec3 arrowDirection) 
+    {
+        for(WrappedGoal task : new ArrayList<>(entity.goalSelector.getAvailableGoals())) 
+        {
+            if(task.getGoal() instanceof EsdeathIceBarrierGoal goal) 
+            {
+                goal.setDirection(arrowDirection);
+            }
+        }
+    }
 	
     @SuppressWarnings("deprecation")
 	public static BlockPos getGroundPos(BlockGetter pLevel, double pX, double startY, double pZ)
@@ -43,16 +87,6 @@ public class AnimeUtil
         return blockpos;
     }
 	
-	public static Entity getOwner(Entity entity)
-	{
-		LazyOptional<IOwnerCapability> cap = entity.getCapability(AnimeCapabilities.OWNER);
-		if(entity.getCapability(AnimeCapabilities.OWNER).isPresent())
-		{
-			return cap.resolve().get().getOwner();
-		}
-		return null;
-	}
-	
 	@SuppressWarnings("deprecation")
 	public static Vec3 getGroundPosAbove(BlockGetter pLevel, double pX, double startY, double pZ)
     {
@@ -65,7 +99,7 @@ public class AnimeUtil
 
         BlockPos blockpos = blockpos$mutable.above();
 
-        return Vec3.atCenterOf(blockpos);
+        return Vec3.atBottomCenterOf(blockpos);
     }
 	
 	public static Vec3 fromToVector(Vec3 from, Vec3 to)
@@ -74,7 +108,24 @@ public class AnimeUtil
 		return motion;
 	}
 	
-	//ChatGPT ahh;
+	public static void tickOwner(Entity entity)
+	{
+		IOwnerCapability cap = entity.getCapability(AnimeCapabilities.OWNER).orElse(new OwnerCapabilityImpl());
+		cap.tick(entity);
+	}
+	
+	public static void setOwner(Entity entity, Entity owner)
+	{
+		IOwnerCapability cap = entity.getCapability(AnimeCapabilities.OWNER).orElse(new OwnerCapabilityImpl());
+		cap.setOwner(owner);
+	}
+    
+	public static Entity getOwner(Entity entity)
+	{
+		IOwnerCapability cap = entity.getCapability(AnimeCapabilities.OWNER).orElse(new OwnerCapabilityImpl());
+		return cap.getOwner(entity);
+	}
+	
 	public static Vec3 bezierMotionVector(Vec3 start, Vec3 control, Vec3 end, float t, float speed) 
 	{
 	    Vec3 derivative = start.subtract(control).scale(2 * (1 - t)).add(end.subtract(control).scale(2 * t));

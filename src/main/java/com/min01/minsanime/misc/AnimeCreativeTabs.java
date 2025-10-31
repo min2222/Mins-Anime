@@ -19,7 +19,8 @@ public class AnimeCreativeTabs
     		.icon(() -> new ItemStack(AnimeItems.FRIEREN_SPAWN_EGG.get()))
     		.displayItems((enabledFeatures, output) -> 
     		{
-    			output.accept(AnimeItems.FRIEREN_SPAWN_EGG.get());
     			output.accept(AnimeItems.ALTAIR_SPAWN_EGG.get());
+    			output.accept(AnimeItems.FRIEREN_SPAWN_EGG.get());
+    			output.accept(AnimeItems.ESDEATH_SPAWN_EGG.get());
     		}).build());
 }
