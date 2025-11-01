@@ -8,7 +8,6 @@ import com.min01.minsanime.entity.ai.goal.EsdeathIceWallGoal;
 import com.min01.minsanime.misc.SmoothAnimationState;
 import com.min01.minsanime.util.AnimeUtil;
 
-import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,7 +63,7 @@ public class EntityEsdeath extends AbstractAnimatableMonster
     	{
     		if(this.canLook())
     		{
-    			this.lookAt(Anchor.EYES, this.getTarget().getEyePosition());
+        		this.getLookControl().setLookAt(this.getTarget(), 30.0F, 30.0F);
     		}
     	}
     	
