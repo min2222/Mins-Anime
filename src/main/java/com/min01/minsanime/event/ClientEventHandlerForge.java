@@ -2,11 +2,13 @@ package com.min01.minsanime.event;
 
 import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.EntityCameraShake;
+import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.util.AnimeClientUtil;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ViewportEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -36,6 +38,15 @@ public class ClientEventHandlerForge
             event.setPitch((float)(event.getPitch() + shakeAmplitude * Math.cos(ticksExistedDelta * 3.0F + 2.0F) * 25.0));
             event.setYaw((float)(event.getYaw() + shakeAmplitude * Math.cos(ticksExistedDelta * 5.0F + 1.0F) * 25.0));
             event.setRoll((float)(event.getRoll() + shakeAmplitude * Math.cos(ticksExistedDelta * 4.0F) * 25.0));
+        }
+    }
+    
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) 
+    {
+        if(event.phase == TickEvent.Phase.START && AnimeClientUtil.MC.player != null && AnimeClientUtil.MC.level != null) 
+        {
+        	AnimeShaderEffects.tick();
         }
     }
 }

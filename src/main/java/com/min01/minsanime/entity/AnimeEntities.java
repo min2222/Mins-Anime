@@ -4,6 +4,7 @@ import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.living.EntityAltair;
 import com.min01.minsanime.entity.living.EntityEsdeath;
 import com.min01.minsanime.entity.living.EntityFrieren;
+import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre;
 import com.min01.minsanime.entity.projectile.EntityIce;
 
@@ -28,6 +29,8 @@ public class AnimeEntities
 	
 	public static final RegistryObject<EntityType<EntityEsdeath>> ESDEATH = registerEntity("esdeath", createBuilder(EntityEsdeath::new, MobCategory.MONSTER).fireImmune());
 	public static final RegistryObject<EntityType<EntityIce>> ICE = registerEntity("ice", createBuilder(EntityIce::new, MobCategory.MISC));
+
+	public static final RegistryObject<EntityType<EntityReze>> REZE = registerEntity("reze", createBuilder(EntityReze::new, MobCategory.MONSTER).fireImmune());
 	
 	public static <T extends Entity> EntityType.Builder<T> createBuilder(EntityType.EntityFactory<T> factory, MobCategory category)
 	{
