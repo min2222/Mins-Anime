@@ -17,7 +17,7 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(4);
-		this.mob.setExplosionScale(30.0F);
+		this.mob.setExplosionScale(10.0F);
 	}
 	
 	@Override

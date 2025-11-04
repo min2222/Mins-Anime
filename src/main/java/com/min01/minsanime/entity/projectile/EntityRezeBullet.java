@@ -115,7 +115,7 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
     	super.handleEntityEvent(p_21375_);
     	if(p_21375_ == 99)
     	{
-        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, 20.0F);
+        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, 10.0F);
 			this.discard();
     	}
     }
