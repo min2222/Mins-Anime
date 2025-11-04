@@ -3,12 +3,8 @@ package com.min01.minsanime.shader;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.min01.minsanime.util.AnimeClientUtil;
-
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class AnimeShaderEffects 
 {
@@ -44,13 +40,9 @@ public class AnimeShaderEffects
 			this.scale = scale;
 		}
 		
-		@OnlyIn(Dist.CLIENT)
 		public void tick()
 		{
-			if(!AnimeClientUtil.MC.isPaused())
-			{
-				this.tickCount++;
-			}
+			this.tickCount++;
 		}
 		
 		public boolean isAlive()

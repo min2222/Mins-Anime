@@ -60,7 +60,7 @@ public class AnimeClientUtil
 		}
 	}
 	
-	public static void applyExplosion(PoseStack mtx, float frameTime, int tickCount, float scale)
+	public static void applyExplosion(PoseStack mtx, float frameTime, float tickCount, float scale)
 	{
 		Minecraft minecraft = AnimeClientUtil.MC;
 

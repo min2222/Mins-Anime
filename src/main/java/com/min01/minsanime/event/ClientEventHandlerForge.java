@@ -55,11 +55,14 @@ public class ClientEventHandlerForge
     }
     
     @SubscribeEvent
-    public static void onClientTick(TickEvent.ClientTickEvent event) 
+    public static void onLevelTick(TickEvent.LevelTickEvent event) 
     {
-        if(event.phase == TickEvent.Phase.START && AnimeClientUtil.MC.player != null && AnimeClientUtil.MC.level != null) 
+        if(event.phase == TickEvent.Phase.START) 
         {
-        	AnimeShaderEffects.tick();
+        	if(!AnimeClientUtil.MC.isPaused())
+        	{
+            	AnimeShaderEffects.tick();
+        	}
         }
     }
     
@@ -80,7 +83,7 @@ public class ClientEventHandlerForge
     			Vec3 pos = worldPos.subtract(camPos);
     			mtx.pushPose();
     			mtx.translate(pos.x, pos.y, pos.z);
-    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount + frameTime, t.scale);
     			mtx.popPose();
     		});
     		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))
