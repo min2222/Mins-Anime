@@ -8,13 +8,17 @@ import com.min01.minsanime.entity.model.ModelBombDevil;
 import com.min01.minsanime.entity.model.ModelEsdeath;
 import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.entity.model.ModelReze;
+import com.min01.minsanime.entity.model.ModelRezeBomb;
+import com.min01.minsanime.entity.model.ModelRezeMissile;
 import com.min01.minsanime.entity.renderer.AltairRenderer;
 import com.min01.minsanime.entity.renderer.AltairSabreRenderer;
 import com.min01.minsanime.entity.renderer.EsdeathRenderer;
 import com.min01.minsanime.entity.renderer.FrierenRenderer;
 import com.min01.minsanime.entity.renderer.IceRenderer;
 import com.min01.minsanime.entity.renderer.NoneRenderer;
+import com.min01.minsanime.entity.renderer.RezeBombRenderer;
 import com.min01.minsanime.entity.renderer.RezeBulletRenderer;
+import com.min01.minsanime.entity.renderer.RezeMissileRenderer;
 import com.min01.minsanime.entity.renderer.RezeRenderer;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.particle.AnimeParticles;
@@ -60,6 +64,8 @@ public class ClientEventHandler
     	event.registerLayerDefinition(ModelEsdeath.LAYER_LOCATION, ModelEsdeath::createBodyLayer);
     	event.registerLayerDefinition(ModelReze.LAYER_LOCATION, ModelReze::createBodyLayer);
     	event.registerLayerDefinition(ModelBombDevil.LAYER_LOCATION, ModelBombDevil::createBodyLayer);
+    	event.registerLayerDefinition(ModelRezeMissile.LAYER_LOCATION, ModelRezeMissile::createBodyLayer);
+    	event.registerLayerDefinition(ModelRezeBomb.LAYER_LOCATION, ModelRezeBomb::createBodyLayer);
     }
     
     @SubscribeEvent
@@ -73,5 +79,7 @@ public class ClientEventHandler
     	event.registerEntityRenderer(AnimeEntities.CAMERA_SHAKE.get(), NoneRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.REZE.get(), RezeRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.REZE_BULLET.get(), RezeBulletRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.REZE_MISSILE.get(), RezeMissileRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.REZE_BOMB.get(), RezeBombRenderer::new);
     }
 }

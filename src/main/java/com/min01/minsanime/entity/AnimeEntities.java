@@ -7,7 +7,9 @@ import com.min01.minsanime.entity.living.EntityFrieren;
 import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre;
 import com.min01.minsanime.entity.projectile.EntityIce;
+import com.min01.minsanime.entity.projectile.EntityRezeBomb;
 import com.min01.minsanime.entity.projectile.EntityRezeBullet;
+import com.min01.minsanime.entity.projectile.EntityRezeMissile;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -33,6 +35,8 @@ public class AnimeEntities
 
 	public static final RegistryObject<EntityType<EntityReze>> REZE = registerEntity("reze", createBuilder(EntityReze::new, MobCategory.CREATURE).fireImmune());
 	public static final RegistryObject<EntityType<EntityRezeBullet>> REZE_BULLET = registerEntity("reze_bullet", createBuilder(EntityRezeBullet::new, MobCategory.MISC).sized(0.5F, 0.5F));
+	public static final RegistryObject<EntityType<EntityRezeMissile>> REZE_MISSILE = registerEntity("reze_missile", createBuilder(EntityRezeMissile::new, MobCategory.MISC).sized(0.5F, 0.5F));
+	public static final RegistryObject<EntityType<EntityRezeBomb>> REZE_BOMB = registerEntity("reze_bomb", createBuilder(EntityRezeBomb::new, MobCategory.MISC).sized(0.5F, 0.5F));
 	
 	public static <T extends Entity> EntityType.Builder<T> createBuilder(EntityType.EntityFactory<T> factory, MobCategory category)
 	{

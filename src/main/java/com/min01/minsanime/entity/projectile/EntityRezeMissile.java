@@ -2,7 +2,6 @@ package com.min01.minsanime.entity.projectile;
 
 import java.util.List;
 
-import com.min01.minsanime.entity.IShaderEffect;
 import com.min01.minsanime.entity.ITrail;
 import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.shader.AnimeShaderEffects;
@@ -12,17 +11,18 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffect, ITrail
+public class EntityRezeMissile extends ThrowableProjectile implements ITrail
 {
     private Vec3[] trailPositions = new Vec3[64];
     private int trailPointer = -1;
     
-	public EntityRezeBullet(EntityType<? extends ThrowableProjectile> p_37466_, Level p_37467_)
+	public EntityRezeMissile(EntityType<? extends ThrowableProjectile> p_37466_, Level p_37467_)
 	{
 		super(p_37466_, p_37467_);
 	}
@@ -31,6 +31,12 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 	protected void defineSynchedData()
 	{
 		
+	}
+	
+	@Override
+	public boolean displayFireAnimation()
+	{
+		return false;
 	}
 	
 	@Override
@@ -46,6 +52,14 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 		if(this.tickCount >= 200)
 		{
 			this.discard();
+		}
+		
+		if(this.getOwner() != null)
+		{
+			if(this.getOwner() instanceof Mob mob && mob.getTarget() != null)
+			{
+				this.setDeltaMovement(AnimeUtil.fromToVector(this.position(), mob.getTarget().getEyePosition(), Math.min(this.tickCount / 20.0F, 2.5F)));
+			}
 		}
 	}
 	

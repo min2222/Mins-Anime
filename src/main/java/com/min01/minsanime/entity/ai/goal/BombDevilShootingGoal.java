@@ -41,7 +41,10 @@ public class BombDevilShootingGoal extends AbstractBombDevilSkillGoal
 		bullet.setOwner(this.mob);
 		bullet.setPos(AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F));
 		bullet.setNoGravity(true);
-		bullet.shootFromRotation(this.mob, this.mob.getXRot(), this.mob.yHeadRot, 0.0F, 2.5F, 0.0F);
+		if(this.mob.getTarget() != null)
+		{
+			bullet.setDeltaMovement(AnimeUtil.fromToVector(bullet.position(), this.mob.getTarget().position(), 2.5F));
+		}
 		this.mob.level.addFreshEntity(bullet);
 	}
 	
@@ -67,6 +70,6 @@ public class BombDevilShootingGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 80;
+		return 180;
 	}
 }

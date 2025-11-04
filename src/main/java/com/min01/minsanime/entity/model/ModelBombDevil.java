@@ -113,10 +113,14 @@ public class ModelBombDevil extends HierarchicalModel<EntityReze>
 		
 		entity.transformAnimationState.animate(this, RezeAnimation.REZE_TRANSFORM, ageInTicks);
 		entity.shootAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_SHOOT, ageInTicks);
-		entity.catchAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_CATCH, ageInTicks);
+		entity.grabAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_GRAB, ageInTicks);
 		entity.dashAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_DASH, ageInTicks);
 		entity.jumpAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_JUMP, ageInTicks);
 		entity.kickAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_KICK, ageInTicks);
+		entity.homingAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_HOMING, ageInTicks);
+		entity.smashAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_SMASH, ageInTicks);
+		entity.punchAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_PUNCH, ageInTicks);
+		entity.airStrikeAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_AIR_STRIKE, ageInTicks);
 		
 		if(entity.isUsingSkill(4))
 		{

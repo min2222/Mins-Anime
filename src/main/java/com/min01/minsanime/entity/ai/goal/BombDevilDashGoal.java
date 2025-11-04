@@ -23,7 +23,7 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && this.mob.goal == this.getClass();
+		return !this.mob.onGround() && this.mob.goal == this.getClass();
 	}
 	
 	@Override

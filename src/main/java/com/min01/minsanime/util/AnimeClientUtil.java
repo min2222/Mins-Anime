@@ -15,12 +15,16 @@ import com.min01.minsanime.obj.Face;
 import com.min01.minsanime.obj.ObjAnimationDefinition;
 import com.min01.minsanime.obj.ObjAnimations;
 import com.min01.minsanime.obj.WavefrontObject;
+import com.min01.minsanime.shader.AnimeShaders;
+import com.min01.minsanime.shader.ExtendedPostChain;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.EffectInstance;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -36,6 +40,50 @@ public class AnimeClientUtil
 	public static final Minecraft MC = Minecraft.getInstance();
 	
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
+	public static final Matrix4f INVERSE_MAT = new Matrix4f();
+    
+    public static void applyBullet(PoseStack mtx, float frameTime)
+	{
+		Minecraft minecraft = AnimeClientUtil.MC;
+
+		ExtendedPostChain shaderChain = AnimeShaders.getBullet();
+		EffectInstance shader = shaderChain.getMainShader();
+
+		if(shader != null)
+		{
+			shader.safeGetUniform("iResolution").set(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+			shader.setSampler("ImageSampler", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/rgba_noise_medium.png")).getId());
+			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
+			shader.safeGetUniform("iTime").set((((float) (minecraft.level.getGameTime() % 2400000)) + frameTime) / 20.0F);
+			shaderChain.process(frameTime);
+			minecraft.getMainRenderTarget().bindWrite(false);
+		}
+	}
+	
+	public static void applyExplosion(PoseStack mtx, float frameTime, int tickCount, float scale)
+	{
+		Minecraft minecraft = AnimeClientUtil.MC;
+
+		ExtendedPostChain shaderChain = AnimeShaders.getExplosion();
+		EffectInstance shader = shaderChain.getMainShader();
+
+		if(shader != null)
+		{
+			shader.safeGetUniform("iResolution").set(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+			shader.setSampler("iChannel0", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/organic4.png")).getId());
+			shader.setSampler("iChannel1", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/rgba_noise_medium.png")).getId());
+			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
+			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
+			shader.safeGetUniform("Scale").set(scale);
+			shaderChain.process(frameTime);
+			minecraft.getMainRenderTarget().bindWrite(false);
+		}
+	}
+	
+	public static Matrix4f getInverseTransformMatrix(Matrix4f outMat, Matrix4f modelView)
+    {
+		return outMat.identity().mul(RenderSystem.getProjectionMatrix()).mul(modelView).invert();
+    }
 	
 	public static void resetPose(WavefrontObject obj)
 	{

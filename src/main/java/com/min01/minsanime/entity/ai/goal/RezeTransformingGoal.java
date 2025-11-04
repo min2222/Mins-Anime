@@ -15,13 +15,12 @@ public class RezeTransformingGoal extends BasicAnimationSkillGoal<EntityReze>
 		super.start();
 		this.mob.setAnimationState(1);
 		this.mob.setExplosionScale(50.0F);
-		this.mob.getNavigation().stop();
 	}
 	
 	@Override
 	public boolean canUse() 
 	{
-		return super.canUse() && !this.mob.isTransformed() && this.mob.distanceTo(this.mob.getTarget()) <= 8.0F;
+		return super.canUse() && !this.mob.isTransformed();
 	}
 
 	@Override

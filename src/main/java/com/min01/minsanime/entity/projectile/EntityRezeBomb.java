@@ -2,7 +2,6 @@ package com.min01.minsanime.entity.projectile;
 
 import java.util.List;
 
-import com.min01.minsanime.entity.IShaderEffect;
 import com.min01.minsanime.entity.ITrail;
 import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.shader.AnimeShaderEffects;
@@ -17,12 +16,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffect, ITrail
+public class EntityRezeBomb extends ThrowableProjectile implements ITrail
 {
     private Vec3[] trailPositions = new Vec3[64];
     private int trailPointer = -1;
     
-	public EntityRezeBullet(EntityType<? extends ThrowableProjectile> p_37466_, Level p_37467_)
+	public EntityRezeBomb(EntityType<? extends ThrowableProjectile> p_37466_, Level p_37467_)
 	{
 		super(p_37466_, p_37467_);
 	}
@@ -31,6 +30,12 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 	protected void defineSynchedData()
 	{
 		
+	}
+	
+	@Override
+	public boolean displayFireAnimation()
+	{
+		return false;
 	}
 	
 	@Override

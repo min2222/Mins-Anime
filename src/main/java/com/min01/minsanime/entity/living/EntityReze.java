@@ -5,16 +5,20 @@ import java.util.List;
 import com.min01.minsanime.entity.AbstractAnimatableCreature;
 import com.min01.minsanime.entity.EntityCameraShake;
 import com.min01.minsanime.entity.ai.goal.AbstractAnimationSkillGoal;
-import com.min01.minsanime.entity.ai.goal.BombDevilCatchingGoal;
+import com.min01.minsanime.entity.ai.goal.BombDevilAirStrikeGoal;
 import com.min01.minsanime.entity.ai.goal.BombDevilDashGoal;
+import com.min01.minsanime.entity.ai.goal.BombDevilGrabGoal;
 import com.min01.minsanime.entity.ai.goal.BombDevilJumpGoal;
 import com.min01.minsanime.entity.ai.goal.BombDevilKickGoal;
+import com.min01.minsanime.entity.ai.goal.BombDevilMissileGoal;
+import com.min01.minsanime.entity.ai.goal.BombDevilPunchGoal;
 import com.min01.minsanime.entity.ai.goal.BombDevilShootingGoal;
 import com.min01.minsanime.entity.ai.goal.RezeTransformingGoal;
 import com.min01.minsanime.misc.SmoothAnimationState;
 import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.util.AnimeUtil;
 
+import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -23,13 +27,13 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
@@ -42,10 +46,14 @@ public class EntityReze extends AbstractAnimatableCreature
 	
 	public final SmoothAnimationState transformAnimationState = new SmoothAnimationState();
 	public final SmoothAnimationState shootAnimationState = new SmoothAnimationState();
-	public final SmoothAnimationState catchAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState grabAnimationState = new SmoothAnimationState();
 	public final SmoothAnimationState dashAnimationState = new SmoothAnimationState();
 	public final SmoothAnimationState jumpAnimationState = new SmoothAnimationState();
 	public final SmoothAnimationState kickAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState homingAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState smashAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState punchAnimationState = new SmoothAnimationState();
+	public final SmoothAnimationState airStrikeAnimationState = new SmoothAnimationState();
 	
 	public Class<? extends AbstractAnimationSkillGoal<EntityReze>> goal;
 	
@@ -78,12 +86,14 @@ public class EntityReze extends AbstractAnimatableCreature
     	super.registerGoals();
     	this.goalSelector.addGoal(0, new RezeTransformingGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilShootingGoal(this));
-    	this.goalSelector.addGoal(0, new BombDevilCatchingGoal(this));
+    	this.goalSelector.addGoal(0, new BombDevilGrabGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilJumpGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilDashGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilKickGoal(this));
+    	this.goalSelector.addGoal(0, new BombDevilMissileGoal(this));
+    	this.goalSelector.addGoal(0, new BombDevilPunchGoal(this));
+    	this.goalSelector.addGoal(0, new BombDevilAirStrikeGoal(this));
     	this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
-    	this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, false));
     }
     
     @Override
@@ -97,25 +107,35 @@ public class EntityReze extends AbstractAnimatableCreature
     	{
     		this.transformAnimationState.updateWhen(this.isUsingSkill(1), this.tickCount);
     		this.shootAnimationState.updateWhen(this.isUsingSkill(2), this.tickCount);
-    		this.catchAnimationState.updateWhen(this.isUsingSkill(3), this.tickCount);
+    		this.grabAnimationState.updateWhen(this.isUsingSkill(3), this.tickCount);
     		this.dashAnimationState.updateWhen(this.isUsingSkill(4), this.tickCount);
     		this.jumpAnimationState.updateWhen(this.isUsingSkill(5), this.tickCount);
     		this.kickAnimationState.updateWhen(this.isUsingSkill(6), this.tickCount);
+    		this.homingAnimationState.updateWhen(this.isUsingSkill(7), this.tickCount);
+    		this.smashAnimationState.updateWhen(this.isUsingSkill(8), this.tickCount);
+    		this.punchAnimationState.updateWhen(this.isUsingSkill(9), this.tickCount);
+    		this.airStrikeAnimationState.updateWhen(this.isUsingSkill(10), this.tickCount);
     	}
     	
-    	if(this.getTarget() != null)
+    	if(this.getTarget() != null && this.getTarget().isAlive())
     	{
     		if(this.canLook())
     		{
-        		this.getLookControl().setLookAt(this.getTarget(), 100.0F, 100.0F);
+    			if(this.isTransformed())
+    			{
+    				this.lookAt(Anchor.EYES, this.getTarget().getEyePosition());
+    			}
+    			else
+    			{
+            		this.getLookControl().setLookAt(this.getTarget(), 100.0F, 100.0F);
+    			}
     		}
     		if(this.canMove())
     		{
-    			this.getNavigation().moveTo(this.getTarget(), !this.isTransformed() ? 0.45F : 0.65F);
+    			this.getNavigation().moveTo(this.getTarget(), 0.65F);
     		}
     	}
     }
-    
     
     public void doExplosion(float damage, float radius, int fireSeconds)
     {
@@ -142,6 +162,16 @@ public class EntityReze extends AbstractAnimatableCreature
 	    		}
 			}
 		});
+    }
+    
+    @Override
+    public boolean hurt(DamageSource p_21016_, float p_21017_) 
+    {
+    	if(p_21016_.getEntity() instanceof LivingEntity living && !this.level.isClientSide)
+    	{
+    		this.setTarget(living);
+    	}
+    	return super.hurt(p_21016_, p_21017_);
     }
     
     @Override

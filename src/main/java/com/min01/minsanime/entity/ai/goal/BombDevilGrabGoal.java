@@ -6,9 +6,9 @@ import com.min01.minsanime.util.AnimeUtil;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-public class BombDevilCatchingGoal extends AbstractBombDevilSkillGoal
+public class BombDevilGrabGoal extends AbstractBombDevilSkillGoal
 {
-	public BombDevilCatchingGoal(EntityReze mob) 
+	public BombDevilGrabGoal(EntityReze mob) 
 	{
 		super(mob);
 	}
