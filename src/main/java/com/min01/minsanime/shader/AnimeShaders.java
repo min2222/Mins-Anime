@@ -15,6 +15,7 @@ public class AnimeShaders implements ResourceManagerReloadListener
 	protected static final List<ExtendedPostChain> SHADERS = new ArrayList<>();
 	
 	protected static ExtendedPostChain EXPLOSION;
+	protected static ExtendedPostChain BULLET;
 
 	@Override
 	public void onResourceManagerReload(ResourceManager manager)
@@ -33,6 +34,7 @@ public class AnimeShaders implements ResourceManagerReloadListener
 	public static void init(ResourceManager manager) throws IOException
 	{
 		EXPLOSION = add(new ExtendedPostChain(MinsAnime.MODID, "explosion"));
+		BULLET = add(new ExtendedPostChain(MinsAnime.MODID, "bullet"));
 	}
 
 	public void clear()
@@ -45,6 +47,11 @@ public class AnimeShaders implements ResourceManagerReloadListener
 	{
 		SHADERS.add(shader);
 		return shader;
+	}
+	
+	public static ExtendedPostChain getBullet() 
+	{
+		return BULLET;
 	}
 	
 	public static ExtendedPostChain getExplosion() 

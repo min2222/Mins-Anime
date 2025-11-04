@@ -8,6 +8,9 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import com.min01.minsanime.MinsAnime;
+import com.min01.minsanime.entity.ITrail;
+import com.min01.minsanime.misc.AnimeRenderType;
 import com.min01.minsanime.obj.Face;
 import com.min01.minsanime.obj.ObjAnimationDefinition;
 import com.min01.minsanime.obj.ObjAnimations;
@@ -15,11 +18,14 @@ import com.min01.minsanime.obj.WavefrontObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.phys.AABB;
@@ -347,5 +353,39 @@ public class AnimeClientUtil
         consumer.vertex(matrix4f, (float) boundingBox.minX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, minV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
         consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.minZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(maxU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
         consumer.vertex(matrix4f, (float) boundingBox.maxX, (float) boundingBox.minY, (float) boundingBox.maxZ).color((float)rgb.x, (float)rgb.y, (float)rgb.z, alpha).uv(minU, maxV).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0.0F, -1.0F, 0.0F).endVertex();
+    }
+    
+    public static void renderTrail(ITrail entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int sampleSize, float trailHeight) 
+    {
+    	Camera camera = MC.gameRenderer.getMainCamera();
+    	Vec3 cameraPos = camera.getPosition();
+        int samples = 0;
+        Vec3 drawFrom = entityIn.getTrailPosition(0, partialTicks);
+        VertexConsumer vertexconsumer = bufferIn.getBuffer(AnimeRenderType.eyesFix(new ResourceLocation(MinsAnime.MODID, "textures/effect/trail.png")));
+        while(samples < sampleSize)
+        {
+            Vec3 sample = entityIn.getTrailPosition(samples, partialTicks);
+            float u1 = samples / (float) sampleSize;
+            float u2 = u1 + 1 / (float) sampleSize;
+            Vec3 draw1 = drawFrom;
+            Vec3 draw2 = sample;
+            Vec3 segmentDir = draw2.subtract(draw1).normalize();
+            Vec3 midPoint = draw1.add(draw2).scale(0.5);
+            Vec3 toCamera = cameraPos.subtract(midPoint).normalize();
+            Vec3 perpendicular = segmentDir.cross(toCamera).normalize().scale(trailHeight);
+            Vec3 v1Bottom = draw1.subtract(perpendicular);
+            Vec3 v1Top = draw1.add(perpendicular);
+            Vec3 v2Bottom = draw2.subtract(perpendicular);
+            Vec3 v2Top = draw2.add(perpendicular);
+            PoseStack.Pose pose = poseStack.last();
+            Matrix4f matrix4f = pose.pose();
+            Matrix3f matrix3f = pose.normal();
+            vertexconsumer.vertex(matrix4f, (float) v1Bottom.x, (float) v1Bottom.y, (float) v1Bottom.z).color(trailR, trailG, trailB, trailA).uv(u1, 1.0F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BLOCK).normal(matrix3f, 0, 1, 0).endVertex();
+            vertexconsumer.vertex(matrix4f, (float) v2Bottom.x, (float) v2Bottom.y, (float) v2Bottom.z).color(trailR, trailG, trailB, trailA).uv(u2, 1.0F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BLOCK).normal(matrix3f, 0, 1, 0).endVertex();
+            vertexconsumer.vertex(matrix4f, (float) v2Top.x, (float) v2Top.y, (float) v2Top.z).color(trailR, trailG, trailB, trailA).uv(u2, 0.0F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BLOCK).normal(matrix3f, 0, 1, 0).endVertex();
+            vertexconsumer.vertex(matrix4f, (float) v1Top.x, (float) v1Top.y, (float) v1Top.z).color(trailR, trailG, trailB, trailA).uv(u1, 0.0F).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BLOCK).normal(matrix3f, 0, 1, 0).endVertex();
+            samples++;
+            drawFrom = sample;
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.model.ModelAltair;
 import com.min01.minsanime.entity.model.ModelAltairSabre;
+import com.min01.minsanime.entity.model.ModelBombDevil;
 import com.min01.minsanime.entity.model.ModelEsdeath;
 import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.entity.model.ModelReze;
@@ -13,6 +14,7 @@ import com.min01.minsanime.entity.renderer.EsdeathRenderer;
 import com.min01.minsanime.entity.renderer.FrierenRenderer;
 import com.min01.minsanime.entity.renderer.IceRenderer;
 import com.min01.minsanime.entity.renderer.NoneRenderer;
+import com.min01.minsanime.entity.renderer.RezeBulletRenderer;
 import com.min01.minsanime.entity.renderer.RezeRenderer;
 import com.min01.minsanime.obj.ObjModelManager;
 import com.min01.minsanime.particle.AnimeParticles;
@@ -57,6 +59,7 @@ public class ClientEventHandler
     	event.registerLayerDefinition(ModelFrieren.LAYER_LOCATION, ModelFrieren::createBodyLayer);
     	event.registerLayerDefinition(ModelEsdeath.LAYER_LOCATION, ModelEsdeath::createBodyLayer);
     	event.registerLayerDefinition(ModelReze.LAYER_LOCATION, ModelReze::createBodyLayer);
+    	event.registerLayerDefinition(ModelBombDevil.LAYER_LOCATION, ModelBombDevil::createBodyLayer);
     }
     
     @SubscribeEvent
@@ -69,5 +72,6 @@ public class ClientEventHandler
     	event.registerEntityRenderer(AnimeEntities.ICE.get(), IceRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.CAMERA_SHAKE.get(), NoneRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.REZE.get(), RezeRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.REZE_BULLET.get(), RezeBulletRenderer::new);
     }
 }

@@ -14,11 +14,11 @@ public class AnimeShaderEffects
 {
 	public static final List<ShaderEffect> EFFECTS = new ArrayList<>();
 	
-	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime)
+	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime, float scale)
 	{
 		if(level.isClientSide)
 		{
-			EFFECTS.add(new ShaderEffect(name, pos, lifeTime));
+			EFFECTS.add(new ShaderEffect(name, pos, lifeTime, scale));
 		}
 	}
 	
@@ -33,13 +33,15 @@ public class AnimeShaderEffects
 		public final String name;
 		public final Vec3 pos;
 		public final int lifeTime;
+		public final float scale;
 		public int tickCount;
 		
-		public ShaderEffect(String name, Vec3 pos, int lifeTime) 
+		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale) 
 		{
 			this.name = name;
 			this.pos = pos;
 			this.lifeTime = lifeTime;
+			this.scale = scale;
 		}
 		
 		@OnlyIn(Dist.CLIENT)
