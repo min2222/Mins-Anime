@@ -3,6 +3,9 @@ package com.min01.minsanime.shader;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.min01.minsanime.network.AddShaderEffectPacket;
+import com.min01.minsanime.network.AnimeNetwork;
+
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -12,9 +15,9 @@ public class AnimeShaderEffects
 	
 	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime, float scale)
 	{
-		if(level.isClientSide)
+		if(!level.isClientSide)
 		{
-			EFFECTS.add(new ShaderEffect(name, pos, lifeTime, scale));
+			AnimeNetwork.sendToAll(new AddShaderEffectPacket(name, pos, lifeTime, scale));
 		}
 	}
 	

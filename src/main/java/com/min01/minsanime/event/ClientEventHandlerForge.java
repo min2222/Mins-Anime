@@ -83,7 +83,7 @@ public class ClientEventHandlerForge
     			Vec3 pos = worldPos.subtract(camPos);
     			mtx.pushPose();
     			mtx.translate(pos.x, pos.y, pos.z);
-    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount + frameTime, t.scale);
+    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
     			mtx.popPose();
     		});
     		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))

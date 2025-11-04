@@ -31,7 +31,7 @@ public class BombDevilGrabGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected void performSkill()
 	{
-		this.mob.doExplosion(20.0F, 20.0F, 20, 98);
+		this.mob.doExplosion(20.0F, 20.0F, 20, true);
 	}
 	
 	@Override

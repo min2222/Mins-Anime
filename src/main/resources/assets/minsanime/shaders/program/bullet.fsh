@@ -84,7 +84,7 @@ void main() {
             vec3 normal = getNormal(p);
             vec3 core = coreEffect(p);
 
-            float ember = texture(ImageSampler, vec2(iTime * 5.0, 0.5)).g; // y좌표를 다르게 하여 다른 값을 샘플링
+            float ember = texture(ImageSampler, vec2(iTime * 5.0, 0.5)).g;
             vec3 emberColor = vec3(1.0, 0.4, 0.1) * ember;
 
             col = mix(col, core, 0.8);

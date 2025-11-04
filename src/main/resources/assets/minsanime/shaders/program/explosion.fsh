@@ -6,7 +6,7 @@
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
 uniform sampler2D iChannel0;
-uniform sampler2D iChannel1; // 노이즈 텍스처
+uniform sampler2D iChannel1;
 
 uniform ivec2 iResolution;
 uniform vec2 OutSize;

@@ -139,12 +139,20 @@ public class EntityReze extends AbstractAnimatableCreature
     
     public void doExplosion(float damage, float radius, int fireSeconds)
     {
-    	this.doExplosion(damage, radius, fireSeconds, 99);
+    	this.doExplosion(damage, radius, fireSeconds, false);
     }
     
-    public void doExplosion(float damage, float radius, int fireSeconds, int id)
+    public void doExplosion(float damage, float radius, int fireSeconds, boolean onHand)
     {
-		this.level.broadcastEntityEvent(this, (byte) id);
+    	if(onHand)
+    	{
+        	AnimeShaderEffects.addEffect(this.level, "Explosion", AnimeUtil.getLookPos(new Vec2(this.getXRot(), this.yHeadRot), this.getEyePosition(), 0, 0, 1.5F), 90, this.getExplosionScale());
+    	}
+    	else
+    	{
+        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, this.getExplosionScale());
+    	}
+    	
 		this.playSound(SoundEvents.GENERIC_EXPLODE, damage, 1.0F);
 		EntityCameraShake.cameraShake(this.level, this.position(), damage, 0.35F, 0, 60);
 		
@@ -172,20 +180,6 @@ public class EntityReze extends AbstractAnimatableCreature
     		this.setTarget(living);
     	}
     	return super.hurt(p_21016_, p_21017_);
-    }
-    
-    @Override
-    public void handleEntityEvent(byte p_21375_)
-    {
-    	super.handleEntityEvent(p_21375_);
-    	if(p_21375_ == 99)
-    	{
-        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, this.getExplosionScale());
-    	}
-    	if(p_21375_ == 98)
-    	{
-        	AnimeShaderEffects.addEffect(this.level, "Explosion", AnimeUtil.getLookPos(new Vec2(this.getXRot(), this.yHeadRot), this.getEyePosition(), 0, 0, 1.5F), 90, this.getExplosionScale());
-    	}
     }
     
     @Override

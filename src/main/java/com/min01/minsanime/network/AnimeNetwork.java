@@ -24,6 +24,7 @@ public class AnimeNetwork
 		CHANNEL.registerMessage(ID++, UpdatePosArrayPacket.class, UpdatePosArrayPacket::encode, UpdatePosArrayPacket::new, UpdatePosArrayPacket.Handler::onMessage);
 		CHANNEL.registerMessage(ID++, UpdateOwnerCapabilityPacket.class, UpdateOwnerCapabilityPacket::encode, UpdateOwnerCapabilityPacket::new, UpdateOwnerCapabilityPacket.Handler::onMessage);
 		CHANNEL.registerMessage(ID++, UpdateZoltraakPacket.class, UpdateZoltraakPacket::encode, UpdateZoltraakPacket::new, UpdateZoltraakPacket.Handler::onMessage);
+		CHANNEL.registerMessage(ID++, AddShaderEffectPacket.class, AddShaderEffectPacket::encode, AddShaderEffectPacket::new, AddShaderEffectPacket.Handler::onMessage);
 	}
 	
     public static <MSG> void sendToServer(MSG message) 

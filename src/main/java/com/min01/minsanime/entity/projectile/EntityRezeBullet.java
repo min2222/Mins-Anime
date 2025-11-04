@@ -91,7 +91,7 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 		super.onHit(p_37260_);
 		if(this.getOwner() != null)
 		{
-			this.level.broadcastEntityEvent(this, (byte) 99);
+        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, 15.0F);
 			List<LivingEntity> list = this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(12.5F), t -> t != this.getOwner() && !t.isAlliedTo(this.getOwner()) && !(t instanceof EntityReze));
 			list.forEach(t -> 
 			{
@@ -106,17 +106,7 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 		    		}
 				}
 			});
+			this.discard();
 		}
 	}
-	
-    @Override
-    public void handleEntityEvent(byte p_21375_)
-    {
-    	super.handleEntityEvent(p_21375_);
-    	if(p_21375_ == 99)
-    	{
-        	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, 15.0F);
-			this.discard();
-    	}
-    }
 }
