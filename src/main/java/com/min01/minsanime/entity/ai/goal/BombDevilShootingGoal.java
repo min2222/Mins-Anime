@@ -26,6 +26,13 @@ public class BombDevilShootingGoal extends AbstractBombDevilSkillGoal
 	{
 		return super.canUse() && (this.mob.distanceTo(this.mob.getTarget()) >= 8.0F || !this.mob.getTarget().onGround());
 	}
+	
+	@Override
+	public void tick() 
+	{
+		super.tick();
+		this.mob.setDeltaMovement(this.mob.getDeltaMovement().scale(0.25F));
+	}
 
 	@Override
 	protected void performSkill()
