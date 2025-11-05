@@ -30,6 +30,8 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -206,6 +208,16 @@ public class EntityReze extends AbstractAnimatableCreature
 	    		this.heal(2.0F);
 			}
 		});
+    }
+    
+    @Override
+    public boolean hurt(DamageSource p_21016_, float p_21017_)
+    {
+    	if(p_21016_.is(DamageTypeTags.IS_EXPLOSION))
+    	{
+    		return false;
+    	}
+    	return super.hurt(p_21016_, p_21017_);
     }
     
     @Override

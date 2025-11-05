@@ -12,6 +12,10 @@ public abstract class AbstractBombDevilSkillGoal extends BasicAnimationSkillGoal
 	@Override
 	public boolean canUse() 
 	{
+		if(this.mob.getTarget() == null || !this.mob.getTarget().isAlive() || this.mob.isUsingSkill())
+		{
+			return false;
+		}
 		if(this.mob.isTransformed())
 		{
 			return super.canUse() || this.mob.goal == this.getClass();
