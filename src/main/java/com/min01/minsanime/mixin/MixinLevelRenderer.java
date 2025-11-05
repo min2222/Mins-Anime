@@ -1,0 +1,75 @@
+package com.min01.minsanime.mixin;
+
+import java.util.ArrayList;
+
+import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.min01.minsanime.entity.IShaderEffect;
+import com.min01.minsanime.shader.AnimeShaderEffects;
+import com.min01.minsanime.util.AnimeClientUtil;
+import com.min01.minsanime.util.AnimeUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+
+@Mixin(value = LevelRenderer.class, priority = -10000)
+public class MixinLevelRenderer 
+{
+	@Inject(at = @At(value = "TAIL"), method = "renderLevel")
+	private void renderLevel(PoseStack mtx, float frameTime, long nanoTime, boolean renderOutline, Camera camera, GameRenderer gameRenderer, LightTexture light, Matrix4f projMat, CallbackInfo ci)
+	{
+		RenderSystem.depthMask(false);
+		new ArrayList<>(AnimeShaderEffects.EFFECTS).forEach(t -> 
+		{
+			Vec3 worldPos = t.pos;
+			Vec3 camPos = camera.getPosition();
+			Vec3 pos = worldPos.subtract(camPos);
+			mtx.pushPose();
+			mtx.translate(pos.x, pos.y, pos.z);
+			if(t.name.equals("Explosion"))
+			{
+    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+			}
+			else if(t.name.equals("Light"))
+			{
+    			AnimeClientUtil.applyLight(mtx, frameTime, t.tickCount);
+			}
+			else if(t.name.equals("ColoredExplosion"))
+			{
+    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t.tickCount, t.scale, t.color);
+			}
+			mtx.popPose();
+		});
+		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))
+		{
+			if(!(entity instanceof IShaderEffect))
+			{
+				continue;
+			}
+			
+			double x = Mth.lerp((double)frameTime, entity.xOld, entity.getX());
+			double y = Mth.lerp((double)frameTime, entity.yOld, entity.getY());
+			double z = Mth.lerp((double)frameTime, entity.zOld, entity.getZ());
+			
+			Vec3 camPos = camera.getPosition();
+			Vec3 entityPos = new Vec3(x, y, z);
+			Vec3 pos = entityPos.subtract(camPos);
+			mtx.pushPose();
+			mtx.translate(pos.x, pos.y + 0.25F, pos.z);
+			AnimeClientUtil.applyBullet(mtx, frameTime);
+			mtx.popPose();
+		}
+		RenderSystem.depthMask(true);
+	}
+}

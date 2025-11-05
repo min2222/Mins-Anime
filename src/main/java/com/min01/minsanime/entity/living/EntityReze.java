@@ -38,8 +38,8 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -75,7 +75,7 @@ public class EntityReze extends AbstractAnimatableCreature
     			.add(Attributes.MAX_HEALTH, 200.0D)
     			.add(Attributes.MOVEMENT_SPEED, 0.45D)
         		.add(Attributes.ARMOR, 1.0D)
-        		.add(Attributes.FOLLOW_RANGE, 60.0D)
+        		.add(Attributes.FOLLOW_RANGE, 100.0D)
         		.add(Attributes.KNOCKBACK_RESISTANCE, 0.5D);
     }
     
@@ -102,7 +102,6 @@ public class EntityReze extends AbstractAnimatableCreature
     	this.goalSelector.addGoal(0, new BombDevilAirStrikeGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilRapidFireGoal(this));
     	this.goalSelector.addGoal(0, new BombDevilRainbowExplosionGoal(this));
-    	this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
     }
     
     @Override
@@ -216,6 +215,15 @@ public class EntityReze extends AbstractAnimatableCreature
     	if(p_21016_.is(DamageTypeTags.IS_EXPLOSION))
     	{
     		return false;
+    	}
+    	//not sure why HurtByTargetGoal cause bug, so i use this method instead;
+    	if(p_21016_.getEntity() instanceof LivingEntity living && !this.level.isClientSide)
+    	{
+    		boolean flag = living instanceof Player player ? !player.getAbilities().instabuild : true;
+    		if(flag)
+    		{
+    			this.setTarget(living);
+    		}
     	}
     	return super.hurt(p_21016_, p_21017_);
     }

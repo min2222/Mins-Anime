@@ -55,6 +55,6 @@ public class BombDevilRainbowExplosionGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 300;
+		return 500;
 	}
 }

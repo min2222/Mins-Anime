@@ -99,6 +99,6 @@ public class BombDevilJumpGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 150;
+		return 200;
 	}
 }
