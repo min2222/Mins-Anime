@@ -14,7 +14,6 @@ public class RezeTransformingGoal extends BasicAnimationSkillGoal<EntityReze>
 	{
 		super.start();
 		this.mob.setAnimationState(1);
-		this.mob.setExplosionScale(50.0F);
 	}
 	
 	@Override
@@ -27,7 +26,7 @@ public class RezeTransformingGoal extends BasicAnimationSkillGoal<EntityReze>
 	protected void performSkill() 
 	{
 		this.mob.setTransformed(true);
-		this.mob.doExplosion(100.0F, 25.0F, 10);
+		this.mob.doExplosion(100.0F, 25.0F, 50.0F, 10);
 	}
 	
 	@Override

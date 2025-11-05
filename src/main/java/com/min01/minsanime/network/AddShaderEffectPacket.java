@@ -16,13 +16,15 @@ public class AddShaderEffectPacket
 	private final Vec3 pos;
 	private final int lifeTime;
 	private final float scale;
+	private final Vec3 color;
 
-	public AddShaderEffectPacket(String name, Vec3 pos, int lifeTime, float scale) 
+	public AddShaderEffectPacket(String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
 	{
 		this.name = name;
 		this.pos = pos;
 		this.lifeTime = lifeTime;
 		this.scale = scale;
+		this.color = color;
 	}
 
 	public AddShaderEffectPacket(FriendlyByteBuf buf)
@@ -31,6 +33,7 @@ public class AddShaderEffectPacket
 		this.pos = AnimeEntityDataSerializers.readVec3(buf);
 		this.lifeTime = buf.readInt();
 		this.scale = buf.readFloat();
+		this.color = AnimeEntityDataSerializers.readVec3(buf);
 	}
 
 	public void encode(FriendlyByteBuf buf)
@@ -39,6 +42,7 @@ public class AddShaderEffectPacket
 		AnimeEntityDataSerializers.writeVec3(buf, this.pos);
 		buf.writeInt(this.lifeTime);
 		buf.writeFloat(this.scale);
+		AnimeEntityDataSerializers.writeVec3(buf, this.color);
 	}
 
 	public static class Handler 
@@ -49,7 +53,7 @@ public class AddShaderEffectPacket
 			{
 				if(ctx.get().getDirection().getReceptionSide().isClient())
 				{
-					AnimeShaderEffects.EFFECTS.add(new ShaderEffect(message.name, message.pos, message.lifeTime, message.scale));
+					AnimeShaderEffects.EFFECTS.add(new ShaderEffect(message.name, message.pos, message.lifeTime, message.scale, message.color));
 				}
 			});
 			ctx.get().setPacketHandled(true);

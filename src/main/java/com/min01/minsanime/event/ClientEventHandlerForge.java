@@ -55,13 +55,13 @@ public class ClientEventHandlerForge
     }
     
     @SubscribeEvent
-    public static void onLevelTick(TickEvent.LevelTickEvent event) 
+    public static void onClientTick(TickEvent.ClientTickEvent event) 
     {
-        if(event.phase == TickEvent.Phase.START) 
+        if(event.phase == TickEvent.Phase.START && AnimeClientUtil.MC.player != null && AnimeClientUtil.MC.level != null) 
         {
         	if(!AnimeClientUtil.MC.isPaused())
         	{
-            	AnimeShaderEffects.tick();
+            	AnimeShaderEffects.EFFECTS.removeIf(t -> !t.isAlive());
         	}
         }
     }
@@ -83,7 +83,18 @@ public class ClientEventHandlerForge
     			Vec3 pos = worldPos.subtract(camPos);
     			mtx.pushPose();
     			mtx.translate(pos.x, pos.y, pos.z);
-    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+    			if(t.name.equals("Explosion"))
+    			{
+        			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+    			}
+    			else if(t.name.equals("Light"))
+    			{
+        			AnimeClientUtil.applyLight(mtx, frameTime, t.tickCount);
+    			}
+    			else if(t.name.equals("ColoredExplosion"))
+    			{
+        			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t.tickCount, t.scale, t.color);
+    			}
     			mtx.popPose();
     		});
     		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))

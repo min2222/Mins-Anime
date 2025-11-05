@@ -41,6 +41,21 @@ public class AnimeClientUtil
 	
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 	public static final Matrix4f INVERSE_MAT = new Matrix4f();
+	
+    public static void applyLight(PoseStack mtx, float frameTime, float tickCount)
+	{
+		Minecraft minecraft = AnimeClientUtil.MC;
+
+		ExtendedPostChain shaderChain = AnimeShaders.getLight();
+		EffectInstance shader = shaderChain.getMainShader();
+
+		if(shader != null)
+		{
+			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
+			shaderChain.process(frameTime);
+			minecraft.getMainRenderTarget().bindWrite(false);
+		}
+	}
     
     public static void applyBullet(PoseStack mtx, float frameTime)
 	{
@@ -55,6 +70,27 @@ public class AnimeClientUtil
 			shader.setSampler("ImageSampler", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/rgba_noise_medium.png")).getId());
 			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
 			shader.safeGetUniform("iTime").set((((float) (minecraft.level.getGameTime() % 2400000)) + frameTime) / 20.0F);
+			shaderChain.process(frameTime);
+			minecraft.getMainRenderTarget().bindWrite(false);
+		}
+	}
+    
+	public static void applyColoredExplosion(PoseStack mtx, float frameTime, float tickCount, float scale, Vec3 color)
+	{
+		Minecraft minecraft = AnimeClientUtil.MC;
+
+		ExtendedPostChain shaderChain = AnimeShaders.getColoredExplosion();
+		EffectInstance shader = shaderChain.getMainShader();
+
+		if(shader != null)
+		{
+			shader.safeGetUniform("iResolution").set(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+			shader.setSampler("iChannel0", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/organic4.png")).getId());
+			shader.setSampler("iChannel1", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/rgba_noise_medium.png")).getId());
+			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
+			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
+			shader.safeGetUniform("Scale").set(scale);
+			shader.safeGetUniform("Color").set((float) color.x, (float) color.y, (float) color.z);
 			shaderChain.process(frameTime);
 			minecraft.getMainRenderTarget().bindWrite(false);
 		}

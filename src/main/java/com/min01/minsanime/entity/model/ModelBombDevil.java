@@ -121,19 +121,22 @@ public class ModelBombDevil extends HierarchicalModel<EntityReze>
 		entity.smashAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_SMASH, ageInTicks);
 		entity.punchAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_PUNCH, ageInTicks);
 		entity.airStrikeAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_AIR_STRIKE, ageInTicks);
+		entity.rapidFireLeftAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_RAPID_FIRE_LEFT, ageInTicks);
+		entity.rapidFireRightAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_RAPID_FIRE_RIGHT, ageInTicks);
+		entity.rainbowExplosionAnimationState.animate(this, BombDevilAnimation.BOMB_DEVIL_RAINBOW_EXPLOSION, ageInTicks);
 		
 		if(entity.isUsingSkill(4))
 		{
 			AnimeClientUtil.animateHead(this.bomb_devil, netHeadYaw, headPitch);
 		}
 		
-		if(!entity.isUsingSkill())
+		if(entity.getAnimationState() == 0)
 		{
 			this.left_arm.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
 	        this.right_arm.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
-	        this.right_leg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
-	        this.left_leg.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
 		}
+        this.right_leg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;
+        this.left_leg.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount * 0.5F;
 	}
 	
 	@Override

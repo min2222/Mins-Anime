@@ -14,13 +14,12 @@ public class BombDevilPunchGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(9);
-		this.mob.setExplosionScale(20.0F);
 	}
 	
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 6.0F && this.mob.onGround();
+		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 6.0F;
 	}
 
 	@Override
@@ -30,7 +29,7 @@ public class BombDevilPunchGoal extends AbstractBombDevilSkillGoal
 		{
 			if(this.mob.distanceTo(this.mob.getTarget()) <= 6.0F)
 			{
-				this.mob.doExplosion(10.0F, 20.0F, 5);
+				this.mob.doExplosion(20.0F, 20.0F, 20.0F, 5);
 				this.mob.getTarget().setDeltaMovement(0.0F, 2.5F, 0.0F);
 			}
 		}
@@ -44,6 +43,10 @@ public class BombDevilPunchGoal extends AbstractBombDevilSkillGoal
 		if(this.mob.getRandom().nextBoolean())
 		{
 			this.mob.goal = BombDevilJumpGoal.class;
+		}
+		else
+		{
+			this.mob.goal = BombDevilRainbowExplosionGoal.class;
 		}
 	}
 
@@ -62,6 +65,6 @@ public class BombDevilPunchGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 100;
+		return 80;
 	}
 }

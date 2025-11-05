@@ -15,16 +15,15 @@ public class AnimeShaderEffects
 	
 	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime, float scale)
 	{
-		if(!level.isClientSide)
-		{
-			AnimeNetwork.sendToAll(new AddShaderEffectPacket(name, pos, lifeTime, scale));
-		}
+		addEffect(level, name, pos, lifeTime, scale, Vec3.ZERO);
 	}
 	
-	public static void tick()
+	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime, float scale, Vec3 color)
 	{
-		new ArrayList<>(EFFECTS).forEach(t -> t.tick());
-		EFFECTS.removeIf(t -> !t.isAlive());
+		if(!level.isClientSide)
+		{
+			AnimeNetwork.sendToAll(new AddShaderEffectPacket(name, pos, lifeTime, scale, color));
+		}
 	}
 	
 	public static class ShaderEffect
@@ -33,24 +32,26 @@ public class AnimeShaderEffects
 		public final Vec3 pos;
 		public final int lifeTime;
 		public final float scale;
+		public final Vec3 color;
 		public int tickCount;
 		
-		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale) 
+		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale)
+		{
+			this(name, pos, lifeTime, scale, Vec3.ZERO);
+		}
+		
+		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
 		{
 			this.name = name;
 			this.pos = pos;
 			this.lifeTime = lifeTime;
 			this.scale = scale;
-		}
-		
-		public void tick()
-		{
-			this.tickCount++;
+			this.color = color;
 		}
 		
 		public boolean isAlive()
 		{
-			return this.tickCount < this.lifeTime;
+			return this.tickCount++ < this.lifeTime;
 		}
 	}
 }

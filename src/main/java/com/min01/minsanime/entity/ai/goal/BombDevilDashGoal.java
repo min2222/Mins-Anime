@@ -4,9 +4,11 @@ import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
+import net.minecraft.world.phys.Vec3;
 
 public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 {
+	private boolean isGround;
 	public BombDevilDashGoal(EntityReze mob) 
 	{
 		super(mob);
@@ -17,13 +19,12 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(4);
-		this.mob.setExplosionScale(10.0F);
 	}
 	
 	@Override
 	public boolean canUse()
 	{
-		return !this.mob.onGround() && this.mob.goal == this.getClass();
+		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) >= 12.0F;
 	}
 	
 	@Override
@@ -36,18 +37,31 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 		}
 		if(this.mob.onGround())
 		{
-			this.mob.doExplosion(15.0F, 15.0F, 10);
+			this.mob.doExplosion(35.0F, 15.0F, 20.0F, 10);
 			this.mob.setAnimationTick(0);
+			this.mob.setAnimationState(0);
 		}
 	}
 
 	@Override
 	protected void performSkill()
 	{
-		this.mob.doExplosion(5.0F, 5.0F, 10);
+		this.mob.doExplosion(5.0F, 5.0F, 20.0F, 10);
 		if(this.mob.getTarget() != null)
 		{
-			this.mob.setDeltaMovement(AnimeUtil.fromToVector(this.mob.position(), this.mob.getTarget().position(), 5.0F));
+			if(this.mob.isFlying())
+			{
+				Vec3 groundPos = AnimeUtil.getGroundPosAbove(this.mob.level, this.mob.getTarget().getX(), this.mob.getY() + 2, this.mob.getTarget().getZ());
+				this.mob.setDeltaMovement(AnimeUtil.fromToVector(this.mob.position(), groundPos, 5.0F));
+				if(Math.random() <= 0.4F)
+				{
+					this.isGround = true;
+				}
+			}
+			else
+			{
+				this.mob.setDeltaMovement(AnimeUtil.fromToVector(this.mob.position(), this.mob.getTarget().position(), 7.0F));
+			}
 		}
 	}
 	
@@ -57,12 +71,17 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 		super.stop();
 		this.mob.setAnimationState(0);
 		this.mob.goal = null;
+		if(this.isGround)
+		{
+			this.mob.setFlying(false);
+			this.isGround = false;
+		}
 	}
 
 	@Override
 	protected int getSkillUsingTime()
 	{
-		return 20;
+		return 15;
 	}
 	
 	@Override
@@ -74,6 +93,6 @@ public class BombDevilDashGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 60;
+		return 90;
 	}
 }

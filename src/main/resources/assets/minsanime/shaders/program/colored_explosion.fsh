@@ -9,6 +9,7 @@ uniform ivec2 iResolution;
 uniform vec2 OutSize;
 uniform float iTime;
 uniform float Scale;
+uniform vec3 Color;
 
 in vec2 texCoord;
 in vec4 near_4;
@@ -103,7 +104,7 @@ vec2 sampleVolumeAndDist(in vec3 rp)
 
 vec3 heatToColor(float heat)
 {
-    vec3 col = mix(vec3(0.0), vec3(1., .3, .0),clamp(heat * 15. -2.,   0., 1.));
+    vec3 col = mix(Color, vec3(1., .3, .0),clamp(heat * 15. -2.,   0., 1.));
     col = mix(col, vec3(1., 1., .6), clamp(heat * 15.1-4.,   0., 1.));
     col = mix(col, vec3(1., .9, .8), clamp(heat * 190. - 60.,   0., 1.));
     return col;

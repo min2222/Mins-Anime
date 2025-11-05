@@ -19,13 +19,9 @@ out vec4 fragColor;
 #define MAX_DIST 100.0
 #define SURF_DIST 0.001
 
-const float BulletSize = 0.25;
-const float FlameSpeed = 2.0;
-const float LavaFlowSpeed = 0.5;
-
 uniform vec3 LightColor = vec3(1.0, 0.5, 0.2);
 uniform float LightIntensity = 2.0;
-uniform float LightRadius = 3.0;
+uniform float LightRadius = 4.0;
 const vec3 LightPos = vec3(0.0, 0.0, 0.0);
 
 float sphereSDF(vec3 p, float r) {
@@ -33,33 +29,12 @@ float sphereSDF(vec3 p, float r) {
 }
 
 float sceneSDF(vec3 p) {
-    return sphereSDF(p, BulletSize);
-}
-
-vec3 getNormal(vec3 p) {
-    const vec2 e = vec2(0.001, 0);
-    float d = sceneSDF(p);
-    vec3 n = d - vec3(
-        sceneSDF(p - e.xyy),
-        sceneSDF(p - e.yxy),
-        sceneSDF(p - e.yyx)
-    );
-    return normalize(n);
+    return sphereSDF(p, 0.0);
 }
 
 float linearizeDepth(float depth) {
     float z = depth * 2.0 - 1.0;
     return (2.0 * NEAR * FAR) / (FAR + NEAR - z * (FAR - NEAR));
-}
-
-vec3 coreEffect(vec3 p) {
-    float lava = sin(p.x * 4.0 + iTime * LavaFlowSpeed) *
-                 cos(p.y * 3.0 + iTime * LavaFlowSpeed) *
-                 sin(p.z * 2.0 + iTime * LavaFlowSpeed);
-    float flame = texture(ImageSampler, vec2(iTime * FlameSpeed, 0.0)).r;
-    vec3 lavaColor = mix(vec3(1.0, 0.3, 0.0), vec3(0.8, 0.1, 0.0), lava);
-    vec3 flameColor = mix(vec3(1.0, 0.5, 0.0), vec3(0.9, 0.1, 0.0), flame);
-    return (lavaColor * 0.7 + flameColor * 0.3);
 }
 
 void main() {
@@ -81,14 +56,6 @@ void main() {
         float dS = sceneSDF(p);
         if(dS < SURF_DIST) {
             hit = true;
-            vec3 normal = getNormal(p);
-            vec3 core = coreEffect(p);
-            float ember = texture(ImageSampler, vec2(iTime * 5.0, 0.5)).g;
-            vec3 emberColor = vec3(1.0, 0.4, 0.1) * ember;
-            col = mix(col, core, 0.95);
-            col += emberColor * 1.5;
-            float edge = smoothstep(0.0, 1.0, 1.0 - dot(normal, -rd));
-            col += edge * vec3(1.0, 0.3, 0.0) * 0.6;
             break; 
         }
         dO += dS;

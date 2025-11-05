@@ -1,6 +1,9 @@
 package com.min01.minsanime.entity.ai.goal;
 
 import com.min01.minsanime.entity.living.EntityReze;
+import com.min01.minsanime.util.AnimeUtil;
+
+import net.minecraft.world.phys.Vec2;
 
 public class BombDevilKickGoal extends AbstractBombDevilSkillGoal
 {
@@ -14,19 +17,18 @@ public class BombDevilKickGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(6);
-		this.mob.setExplosionScale(30.0F);
 	}
 	
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 4.0F;
+		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 6.0F;
 	}
 
 	@Override
 	protected void performSkill()
 	{
-		this.mob.doExplosion(50.0F, 30.0F, 25, true);
+		this.mob.doExplosion(50.0F, 30.0F, 30.0F, 25, AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F));
 	}
 	
 	@Override
@@ -51,6 +53,6 @@ public class BombDevilKickGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 40;
+		return 80;
 	}
 }

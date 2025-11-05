@@ -3,7 +3,6 @@ package com.min01.minsanime.entity.renderer;
 import com.min01.minsanime.MinsAnime;
 import com.min01.minsanime.entity.model.ModelRezeBomb;
 import com.min01.minsanime.entity.projectile.EntityRezeBomb;
-import com.min01.minsanime.util.AnimeClientUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
@@ -14,7 +13,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 
 public class RezeBombRenderer extends EntityRenderer<EntityRezeBomb>
 {
@@ -33,25 +31,14 @@ public class RezeBombRenderer extends EntityRenderer<EntityRezeBomb>
 		p_114488_.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(p_114487_, p_114485_.yRotO, p_114485_.getYRot()) + 180.0F));
 		p_114488_.mulPose(Axis.XP.rotationDegrees(Mth.lerp(p_114487_, p_114485_.xRotO, p_114485_.getXRot())));
 		p_114488_.scale(-1.0F, -1.0F, 1.0F);
-		p_114488_.scale(0.5F, 0.5F, 0.5F);
 		p_114488_.translate(0.0F, -1.25F, 0.0F);
 		this.model.renderToBuffer(p_114488_, p_114489_.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(p_114485_))), p_114490_, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 		p_114488_.popPose();
-		
-		if(p_114485_.hasTrail())
-		{
-			p_114488_.pushPose();
-			Vec3 pos = p_114485_.getPosition(p_114487_);
-			p_114488_.translate(-pos.x, -pos.y + 0.25F, -pos.z);
-	        Vec3 color = Vec3.fromRGB24(16730624);
-	        AnimeClientUtil.renderTrail(p_114485_, p_114487_, p_114488_, p_114489_, (float)color.x, (float)color.y, (float)color.z, 0.8F, 10, 0.1F);
-	        p_114488_.popPose();
-		}
 	}
 
 	@Override
 	public ResourceLocation getTextureLocation(EntityRezeBomb p_114482_)
 	{
-		return new ResourceLocation(MinsAnime.MODID, "textures/entity/reze_missile.png");
+		return new ResourceLocation(MinsAnime.MODID, "textures/entity/reze_bomb.png");
 	}
 }

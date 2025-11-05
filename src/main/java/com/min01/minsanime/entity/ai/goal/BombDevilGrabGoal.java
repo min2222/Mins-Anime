@@ -18,7 +18,6 @@ public class BombDevilGrabGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(3);
-		this.mob.setExplosionScale(20.0F);
 		this.mob.setCanLook(false);
 	}
 	
@@ -31,7 +30,13 @@ public class BombDevilGrabGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected void performSkill()
 	{
-		this.mob.doExplosion(20.0F, 20.0F, 20, true);
+		this.mob.doExplosion(20.0F, 20.0F, 20.0F, 20, AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F));
+	}
+	
+	@Override
+	public boolean canContinueToUse() 
+	{
+		return super.canContinueToUse() && this.mob.getTarget() != null && this.mob.distanceTo(this.mob.getTarget()) <= 3.0F;
 	}
 	
 	@Override

@@ -25,30 +25,20 @@ public class BombDevilAirStrikeGoal extends AbstractBombDevilSkillGoal
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && !this.mob.onGround() && this.mob.goal == this.getClass();
-	}
-	
-	@Override
-	public void tick()
-	{
-		super.tick();
-		if(!this.mob.onGround())
-		{
-			this.mob.setDeltaMovement(this.mob.getDeltaMovement().scale(0.25F));
-		}
+		return super.canUse() && !this.mob.onGround() && this.mob.distanceTo(this.mob.getTarget()) <= 20.0F;
 	}
 
 	@Override
 	protected void performSkill()
 	{
 		RandomSource random = this.mob.getRandom();
-		for(int i = 0; i < 8; i++)
+		for(int i = 0; i < 30; i++)
 		{
 			Vec3 spreadPos = AnimeUtil.getSpreadPosition(this.mob.level, this.mob.position(), new Vec3(10, 2, 10));
 			EntityRezeBomb bomb = new EntityRezeBomb(AnimeEntities.REZE_BOMB.get(), this.mob.level);
 			bomb.setOwner(this.mob);
 			bomb.setPos(spreadPos);
-			bomb.setDeltaMovement(random.nextGaussian() * 0.15F, 0.0F, random.nextGaussian() * 0.15F);
+			bomb.setDeltaMovement(random.nextGaussian() * 0.35F, 0.0F, random.nextGaussian() * 0.35F);
 			this.mob.level.addFreshEntity(bomb);
 		}
 	}
@@ -64,7 +54,7 @@ public class BombDevilAirStrikeGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingTime()
 	{
-		return 30;
+		return 20;
 	}
 	
 	@Override
@@ -76,6 +66,6 @@ public class BombDevilAirStrikeGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 120;
+		return 400;
 	}
 }

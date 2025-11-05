@@ -2,6 +2,7 @@ package com.min01.minsanime.entity.projectile;
 
 import java.util.List;
 
+import com.min01.minsanime.entity.EntityCameraShake;
 import com.min01.minsanime.entity.IShaderEffect;
 import com.min01.minsanime.entity.ITrail;
 import com.min01.minsanime.entity.living.EntityReze;
@@ -10,6 +11,7 @@ import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -43,7 +45,7 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 			this.tickTrail();
 		}
 		
-		if(this.tickCount >= 200)
+		if(this.tickCount >= 150)
 		{
 			this.discard();
 		}
@@ -91,6 +93,9 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 		super.onHit(p_37260_);
 		if(this.getOwner() != null)
 		{
+			this.playSound(SoundEvents.GENERIC_EXPLODE, 1.0F, 1.0F);
+			EntityCameraShake.cameraShake(this.level, this.position(), 50.0F, 0.15F, 0, 40);
+			
         	AnimeShaderEffects.addEffect(this.level, "Explosion", this.position(), 90, 15.0F);
 			List<LivingEntity> list = this.level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(12.5F), t -> t != this.getOwner() && !t.isAlliedTo(this.getOwner()) && !(t instanceof EntityReze));
 			list.forEach(t -> 
