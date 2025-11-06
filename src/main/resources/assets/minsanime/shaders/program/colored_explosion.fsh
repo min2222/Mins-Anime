@@ -108,7 +108,7 @@ void main() {
     
     const float epsilon = .001;
     float visibility = 1.0;
-    float light0 = 0.5;
+    float light0 = 0.0;
     float light1 = 0.5;
     vec3 sunDir = normalize(vec3(1));
 
@@ -120,7 +120,6 @@ void main() {
         if(currentWorldDist > depth) {
         	break;
         }
-        if ( pos.y < .0 ) vis = 1.;
         h = max(h,epsilon);
         if ( vis < 1. )
         {
@@ -139,7 +138,7 @@ void main() {
     vec4 cloudCol = vec4(0.);
     cloudCol += light0*vec4(Color, 0);
 	cloudCol *= pow(g_blastTime,.5)*.5;
-    cloudCol += light1*vec4(Color, 0)/(25.*pow(g_blastTime,2.));
+    cloudCol += light1*vec4(8,2,.25,0)/(25.*pow(g_blastTime,2.));
     
     cloudCol = pow(cloudCol,vec4(1./2.2));
     
