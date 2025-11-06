@@ -114,4 +114,10 @@ public class EntityRezeBullet extends ThrowableProjectile implements IShaderEffe
 			this.discard();
 		}
 	}
+	
+	@Override
+	public String getEffetName() 
+	{
+		return "Bullet";
+	}
 }

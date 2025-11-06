@@ -2,11 +2,9 @@
 
 uniform sampler2D DiffuseSampler;
 uniform sampler2D DepthSampler;
-uniform sampler2D iChannel0;
-uniform sampler2D iChannel1;
+uniform sampler3D ImageSampler;
 
 uniform ivec2 iResolution;
-uniform vec2 OutSize;
 uniform float iTime;
 uniform float Scale;
 uniform vec3 Color;
@@ -19,206 +17,132 @@ out vec4 fragColor;
 
 #define near 0.05
 #define far 1000.0
-
-const int MAX_STEPS = 100;
-const float MAX_DIST = 200.0;
-const float SURF_DIST = 0.001;
-
-const int NUM_SAMPLES = 64;
-const float DENSITY_MULTIPLIER = 1.0;
-
-#define PI 3.14159265358
-#define SAMPLE samplePos3D 
-const vec3 up =  vec3(0.0, 1.0, 0.01);
-
-float RADIUS = 0.;
-float THICKNESS = 0.0;
-float T = 0.0;
-float ROTATION_T = 0.0;
-float DECAY = .0;
-
-float c, s;
-
 float linearizeDepth(float depth) {
     float z = depth * 2.0 - 1.0;
     return (2.0 * near * far) / (far + near - z * (far - near));
 }
 
-float sdSphere( vec3 p, float s )
+// Hazel Quantock 2017
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+// https://creativecommons.org/licenses/by-nc-sa/3.0/
+
+float g_blastTime;
+vec3 g_cloudCentre;
+void InitBlastParams()
 {
-  return length(p)-s;
+    g_blastTime = fract(iTime/20.);
+    g_cloudCentre = vec3(0,g_blastTime*5.,0);
 }
 
-float noise( in vec3 x )
+vec3 Flow( vec3 pos )
 {
-    vec3 p = floor(x);
-    vec3 f = fract(x);
-	vec2 uv = (p.xy+vec2(37.0,17.0)*p.z) + f.xy;
-	vec2 rg = texture(iChannel1, (uv+ 0.5)/256.0).yx;
-	return mix( rg.x, rg.y, f.z );
-}
-
-float mapLo(in vec3 rp)
-{
-    return sdSphere(rp, RADIUS)*.005;
-}
-
-vec3 samplePos3D(in vec3 rp)
-{
-    vec3 fw = normalize(vec3(rp.x, 0.0, rp.z));
-    vec3 pIn = fw * RADIUS;
-    vec3 rt =  cross(fw, up);
-
-    vec3 localP = rp-pIn;
+    // make a toroidal roll, like a mushroom cloud
+    vec3 p = pos - g_cloudCentre;
+    vec3 v;
+    v.xz = -normalize(p.xz)*p.y;
+    v.y = length(p.xz)-.8;
+    //v *= smoothstep(.0,.5,length(pos.xz)); bad: this squashes/stretches it
+    v *= .1;
     
-    vec3 localP_rot = vec3(dot(fw, localP), dot(up, localP), dot(rt, localP));
-
-    vec3 localP_rot_z = vec3(
-        localP_rot.x * c - localP_rot.y * s,
-        localP_rot.x * s + localP_rot.y * c,
-        localP_rot.z
-    );
-
-    vec3 localP_final = fw * localP_rot_z.x + up * localP_rot_z.y + rt * localP_rot_z.z;
-
-    return (localP_final + pIn);
-}
-
-vec2 sampleVolumeAndDist(in vec3 rp)
-{
-    float s = sdSphere(rp, RADIUS);
-
-    float mapLo_dist = s * 0.005;
-
-    vec3 v = cos(T*.15+rp*15.)+ sin(T*.25+rp*10.);
-    float t_map = s - dot(v, v)*.005;
-    float t_smooth = -smoothstep(0., -THICKNESS*.5, t_map);
+    // reduce velocity with distance from cloud top edge
+    float g = length(vec2(p.y,length(p.xz)-.8))-1.; // this doesn't match the one in SDF, but it looks better with the mismatch
+    v *= exp2(-pow(g*3.,2.));
     
-    float d_noise = noise(SAMPLE(rp)*22.)*.8;
-    d_noise += noise(SAMPLE(rp)*100.)*.4;
-    
-    float density = clamp(-t_smooth, 0.0, 1.0) * d_noise;
-
-    return vec2(density, mapLo_dist);
+    return v;
 }
 
-vec3 heatToColor(float heat)
+float SDF( vec3 pos )
 {
-    vec3 col = mix(Color, vec3(1., .3, .0),clamp(heat * 15. -2.,   0., 1.));
-    col = mix(col, vec3(1., 1., .6), clamp(heat * 15.1-4.,   0., 1.));
-    col = mix(col, vec3(1., .9, .8), clamp(heat * 190. - 60.,   0., 1.));
-    return col;
-}
+    // multi fractal
+    const float period = 1.6;
+    float tt = fract(iTime/period);
+    float t[2] = float[2]( tt*period, (tt-1.)*period );
+    vec3 uvw = (pos-g_cloudCentre)/30.;
+    float f[2] = float[2]( .0, .0 );
 
-vec4 trace(vec3 ro, vec3 rd, float sceneDepth)
-{
-    vec4 col = vec4(0.0);
-    float dO = 0.0;
-    for(int i = 0; i < MAX_STEPS; i++) {
-        if(dO > MAX_DIST || dO > sceneDepth) {
-            break;
-        }
-
-        vec3 p = ro + rd * dO;
-        float dS = mapLo(p);
-        if(dS < SURF_DIST) {
-            
-            vec3 p_entry = p;
-            
-            float b = dot(p_entry, rd);
-            float c = dot(p_entry, p_entry) - RADIUS*RADIUS;
-            float disc = b*b - c;
-            
-            if (disc < 0.0) {
-                break;
-            }
-            
-            float t_exit = -b + sqrt(disc); 
-
-            float d_remaining_scene = sceneDepth - dO;
-            float d_remaining_max = MAX_DIST - dO;
-            
-            float pathLength = min(t_exit, min(d_remaining_scene, d_remaining_max));
-
-            if (pathLength < 0.001) {
-                break;
-            }
-            
-            float stepSize = pathLength / float(NUM_SAMPLES);
-            
-            for (int j = 0; j < NUM_SAMPLES; ++j) {
-                
-                vec3 p_sample = p_entry + rd * (float(j) + 0.5) * stepSize;
-
-                float currentWorldDist = length(p_sample - ro) * Scale;
-                if (currentWorldDist > sceneDepth) {
-                    break;
-                }
-                
-                vec2 vol_data = sampleVolumeAndDist(p_sample);
-                float density = vol_data.x;
-                
-                float heat = density;
-                heat = (heat) / (max(1.0, (T * 0.5) - 0.1));
-                vec3 dcol = heatToColor(heat);
-
-                float smoke = heat / 0.03;
-                if (smoke < 1.0) {
-                    dcol = vec3(smoke * 0.5);
-                }
-
-                float d = density * (stepSize * Scale) * DENSITY_MULTIPLIER * DECAY;
-                
-                if (col.a >= 0.9) break;
-                col.rgb = mix(col.rgb, dcol, (1.0 - col.a) * d);
-                col.a += d;
-            }
-            break; 
-        }
-
-        dO += max(dS, 0.01);
+    for ( int i=0; i < 2; i++ )
+    {
+	    vec3 offset = Flow(pos)*t[i];
+        vec3 u = uvw + offset*.2; offset *= .2;
+        f[i] += texture(ImageSampler, offset+u*2.).x/2.;
+        f[i] += texture(ImageSampler, offset+u*4.).x/4.;
+        f[i] += texture(ImageSampler, offset+u*8.).x/8.;
+        f[i] += texture(ImageSampler, offset+u*16.).x/16.;
+        f[i] += texture(ImageSampler, offset+u*32.).x/32.;
     }
+    
+    float ff = mix( f[0], f[1], tt );
+    ff *= .5;
 
-    col.rgb = smoothstep(0.0, 0.3, col.rgb);
-    col.a = smoothstep(0.0, 0.95, col.a);
-    return col;
+    vec3 p = pos - g_cloudCentre;
+    float bulge = 1.-exp2(-20.*g_blastTime);
+    float g = length(vec2(p.y,length(p.xz)-1.*bulge))-1.;
+    ff *= bulge;
+    
+    float h = length(pos.xz)-.7+.2*(g_cloudCentre.y-pos.y-1.2);
+    h = max(h, pos.y-g_cloudCentre.y);
+    h = max(h,(g_cloudCentre.y*1.25-4.-pos.y)*.3);
+    
+    g = min(g,h);
+    ff += g*.6;
+    
+    return ff;
 }
 
-float easeOut(float t, float b, float c, float d)
-{
-	t /= d;
-	return -c * t*(t-2.) + b;    
-}
 
-void main()
-{
-    vec2 uv = (gl_FragCoord.xy-iResolution.xy*.5) / iResolution.x;
-    vec4 col = texture(DiffuseSampler, texCoord);
-    float depth = texture(DepthSampler, texCoord).r;
-    float linearizedDepth = linearizeDepth(depth);
-    
-    T = mod(iTime, 4.5)*8.;
-    ROTATION_T = pow(T*.2, 1.2);
-    DECAY = 1.-smoothstep(7.0, 20., T);
-    
-    c = cos(-ROTATION_T);
-    s = sin(-ROTATION_T);
-    
-    float expandTime = 2.;
-    float ease = easeOut(min(T, expandTime), 0.01, 1.0, expandTime);
-	float r = clamp(ease, 0.0, 1.0)*.1;    
-    
-    RADIUS = r*1.2;
-    THICKNESS = r*2.;
-    RADIUS += T*.02;
-
+void main() {
     vec3 ro = near_4.xyz / near_4.w;
     vec3 rd = normalize(far_4.xyz / far_4.w - ro);
     
-    ro /= Scale;
-   	
-   	vec4 trace_result = trace(ro, rd, linearizedDepth);
-    col = mix(col, trace_result, trace_result.a);
+    vec4 originalCol = texture(DiffuseSampler, texCoord);
     
-	fragColor = vec4(col.rgb, 1.0);
+    float depth = linearizeDepth(texture(DepthSampler, texCoord).r);
+	
+	InitBlastParams();
+    
+    vec3 ray = rd;
+    vec3 pos = ro / Scale;
+    
+    float softness = .1+pow(g_blastTime,2.)*.5;
+    float density = 1.2/softness;
+    
+    const float epsilon = .001;
+    float visibility = 1.0;
+    float light0 = 0.5;
+    float light1 = 0.5;
+    vec3 sunDir = normalize(vec3(1));
+
+    for ( int i=0; i < 20; i++ )
+    {
+        float h = SDF(pos);
+        float vis = smoothstep(epsilon,softness,h);
+        float currentWorldDist = length(pos * Scale - ro);
+        if(currentWorldDist > depth) {
+        	break;
+        }
+        if ( pos.y < .0 ) vis = 1.;
+        h = max(h,epsilon);
+        if ( vis < 1. )
+        {
+            float newvis = visibility * pow(vis,h*density);
+	    	light0 += (visibility - newvis) * smoothstep( -.5, 1., (SDF(pos+sunDir*softness) - h)/softness );
+            vec3 lightDelta = g_cloudCentre-pos;
+	    	light1 += (visibility - newvis) * pow(smoothstep( -1., 1., (SDF(pos+normalize(lightDelta)*softness) - h)/softness ),2.) / (dot(lightDelta,lightDelta)+1.);
+            visibility = newvis;
+        }
+        
+        if ( vis <= 0.)
+            break;
+        pos += h*ray;
+    }
+
+    vec4 cloudCol = vec4(0.);
+    cloudCol += light0*vec4(Color, 0);
+	cloudCol *= pow(g_blastTime,.5)*.5;
+    cloudCol += light1*vec4(Color, 0)/(25.*pow(g_blastTime,2.));
+    
+    cloudCol = pow(cloudCol,vec4(1./2.2));
+    
+    fragColor = mix(cloudCol, originalCol, visibility);
+    fragColor.a = originalCol.a;
 }

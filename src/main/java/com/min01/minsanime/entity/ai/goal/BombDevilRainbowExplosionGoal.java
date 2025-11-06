@@ -6,6 +6,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class BombDevilRainbowExplosionGoal extends AbstractBombDevilSkillGoal
 {
+	public int count;
 	public BombDevilRainbowExplosionGoal(EntityReze mob) 
 	{
 		super(mob);
@@ -27,9 +28,23 @@ public class BombDevilRainbowExplosionGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected void performSkill()
 	{
-		this.mob.doRainbowExplosion(150.0F, 25.0F, 40.0F, 40, this.mob.position(), new Vec3(1, 0, 0));
-		this.mob.doRainbowExplosion(150.0F, 25.0F, 40.0F, 40, this.mob.position().add(0, 15, 0), Vec3.fromRGB24(15797921));
-		this.mob.doRainbowExplosion(150.0F, 25.0F, 40.0F, 40, this.mob.position().add(0, 30, 0), new Vec3(0, 0, 1));
+		if(this.count < 3)
+		{
+			if(this.count == 0)
+			{
+				this.mob.doRainbowExplosion(150.0F, 25.0F, 10.0F, 40, this.mob.position(), new Vec3(0.9F, 0.05F, 0.05F));
+			}
+			if(this.count == 1)
+			{
+				this.mob.doRainbowExplosion(150.0F, 25.0F, 10.0F, 40, this.mob.position().add(0, 10, 0), Vec3.fromRGB24(15797921));
+			}
+			if(this.count == 2)
+			{
+				this.mob.doRainbowExplosion(150.0F, 25.0F, 10.0F, 40, this.mob.position().add(0, 20, 0), new Vec3(0, 0, 1));
+			}
+			this.skillWarmupDelay = this.adjustedTickDelay(this.getSkillWarmupTime());
+			this.count++;
+		}
 	}
 	
 	@Override
@@ -38,18 +53,19 @@ public class BombDevilRainbowExplosionGoal extends AbstractBombDevilSkillGoal
 		super.stop();
 		this.mob.setAnimationState(0);
 		this.mob.goal = BombDevilMissileGoal.class;
+		this.count = 0;
 	}
 
 	@Override
 	protected int getSkillUsingTime()
 	{
-		return 20;
+		return 50;
 	}
 	
 	@Override
 	protected int getSkillWarmupTime() 
 	{
-		return 5;
+		return 10;
 	}
 
 	@Override

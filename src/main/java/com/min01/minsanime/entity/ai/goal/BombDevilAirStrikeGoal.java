@@ -25,7 +25,18 @@ public class BombDevilAirStrikeGoal extends AbstractBombDevilSkillGoal
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && !this.mob.onGround() && this.mob.distanceTo(this.mob.getTarget()) <= 20.0F;
+		Vec3 groundPos = AnimeUtil.getGroundPosAbove(this.mob.level, this.mob.getX(), this.mob.getY() + 2, this.mob.getZ());
+		return super.canUse() && !this.mob.onGround() && this.mob.distanceTo(this.mob.getTarget()) <= 20.0F && this.mob.position().distanceTo(groundPos) >= 8.0F;
+	}
+	
+	@Override
+	public void tick() 
+	{
+		super.tick();
+		if(!this.mob.isFlying())
+		{
+			this.mob.setDeltaMovement(this.mob.getDeltaMovement().scale(0.15F));
+		}
 	}
 
 	@Override
@@ -66,6 +77,6 @@ public class BombDevilAirStrikeGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingInterval() 
 	{
-		return 400;
+		return 300;
 	}
 }

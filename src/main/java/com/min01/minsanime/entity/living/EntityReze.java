@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.min01.minsanime.entity.AbstractAnimatableCreature;
 import com.min01.minsanime.entity.EntityCameraShake;
+import com.min01.minsanime.entity.IShaderEffect;
 import com.min01.minsanime.entity.ai.control.FlyingMoveControl;
 import com.min01.minsanime.entity.ai.goal.AbstractAnimationSkillGoal;
 import com.min01.minsanime.entity.ai.goal.BombDevilAirStrikeGoal;
@@ -32,6 +33,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
@@ -41,9 +43,10 @@ import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityReze extends AbstractAnimatableCreature
+public class EntityReze extends AbstractAnimatableCreature implements IShaderEffect
 {
 	public static final EntityDataAccessor<Boolean> IS_TRANSFORMED = SynchedEntityData.defineId(EntityReze.class, EntityDataSerializers.BOOLEAN);
 	public static final EntityDataAccessor<Boolean> IS_FLYING = SynchedEntityData.defineId(EntityReze.class, EntityDataSerializers.BOOLEAN);
@@ -163,7 +166,7 @@ public class EntityReze extends AbstractAnimatableCreature
     
     public void doRainbowExplosion(float damage, float radius, float scale, int fireSeconds, Vec3 pos, Vec3 color)
     {
-    	AnimeShaderEffects.addEffect(this.level, "ColoredExplosion", pos, 90, scale, color);
+    	AnimeShaderEffects.addEffect(this.level, "ColoredExplosion", pos, 200, scale, color);
     	
 		this.playSound(SoundEvents.GENERIC_EXPLODE, damage, 1.0F);
 		EntityCameraShake.cameraShake(this.level, this.position(), damage, 0.25F, 0, 40);
@@ -252,6 +255,36 @@ public class EntityReze extends AbstractAnimatableCreature
     		return Component.translatable("entity.minsanime.bomb_devil");
     	}
     	return super.getTypeName();
+    }
+    
+    @Override
+    public String getEffetName() 
+    {
+    	return "Light";
+    }
+    
+    @Override
+    public boolean shouldApplyEffect() 
+    {
+    	if(this.getAnimationState() == 2)
+    	{
+    		return this.getAnimationTick() > 10;
+    	}
+    	if(this.getAnimationState() == 11 || this.getAnimationState() == 12)
+    	{
+    		return this.getAnimationTick() > 10;
+    	}
+    	if(this.getAnimationState() == 7)
+    	{
+    		return this.getAnimationTick() > 10;
+    	}
+    	return false;
+    }
+    
+    @Override
+    public Vec3 getEffectPosition(Entity entity)
+    {
+    	return AnimeUtil.getLookPos(new Vec2(this.getXRot(), this.yHeadRot), this.getEyePosition(), 0, 0, 1.5F);
     }
     
     public void switchControl(boolean isFlying)

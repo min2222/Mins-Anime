@@ -22,7 +22,7 @@ public class BombDevilKickGoal extends AbstractBombDevilSkillGoal
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 6.0F;
+		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) <= 4.0F;
 	}
 
 	@Override

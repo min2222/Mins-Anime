@@ -41,33 +41,37 @@ public class MixinLevelRenderer
 			{
     			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
 			}
-			else if(t.name.equals("Light"))
-			{
-    			AnimeClientUtil.applyLight(mtx, frameTime, t.tickCount);
-			}
 			else if(t.name.equals("ColoredExplosion"))
 			{
-    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t.tickCount, t.scale, t.color);
+    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t.tickCount, t.scale, t.color, t);
 			}
 			mtx.popPose();
 		});
 		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))
 		{
-			if(!(entity instanceof IShaderEffect))
+			if(!(entity instanceof IShaderEffect effect) || !effect.shouldApplyEffect())
 			{
 				continue;
 			}
-			
-			double x = Mth.lerp((double)frameTime, entity.xOld, entity.getX());
-			double y = Mth.lerp((double)frameTime, entity.yOld, entity.getY());
-			double z = Mth.lerp((double)frameTime, entity.zOld, entity.getZ());
-			
-			Vec3 camPos = camera.getPosition();
-			Vec3 entityPos = new Vec3(x, y, z);
-			Vec3 pos = entityPos.subtract(camPos);
 			mtx.pushPose();
-			mtx.translate(pos.x, pos.y + 0.25F, pos.z);
-			AnimeClientUtil.applyBullet(mtx, frameTime);
+			Vec3 camPos = camera.getPosition();
+			if(effect.getEffetName().equals("Bullet"))
+			{
+				double x = Mth.lerp((double)frameTime, entity.xOld, entity.getX());
+				double y = Mth.lerp((double)frameTime, entity.yOld, entity.getY());
+				double z = Mth.lerp((double)frameTime, entity.zOld, entity.getZ());
+				
+				Vec3 entityPos = new Vec3(x, y, z);
+				Vec3 pos = entityPos.subtract(camPos);
+				mtx.translate(pos.x, pos.y + 0.25F, pos.z);
+				AnimeClientUtil.applyBullet(mtx, frameTime);
+			}
+			else if(effect.getEffetName().equals("Light"))
+			{
+				Vec3 pos = effect.getEffectPosition(entity).subtract(camPos);
+				mtx.translate(pos.x, pos.y, pos.z);
+				AnimeClientUtil.applyLight(mtx, frameTime);
+			}
 			mtx.popPose();
 		}
 		RenderSystem.depthMask(true);

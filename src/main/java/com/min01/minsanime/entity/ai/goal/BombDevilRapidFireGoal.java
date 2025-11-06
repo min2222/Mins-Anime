@@ -3,7 +3,6 @@ package com.min01.minsanime.entity.ai.goal;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.entity.projectile.EntityRezeBullet;
-import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.world.phys.Vec2;
@@ -29,7 +28,6 @@ public class BombDevilRapidFireGoal extends AbstractBombDevilSkillGoal
 		{
 			this.mob.setAnimationState(12);
 		}
-    	AnimeShaderEffects.addEffect(this.mob.level, "Light", AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F), 10, 0);
 	}
 	
 	@Override
@@ -61,7 +59,6 @@ public class BombDevilRapidFireGoal extends AbstractBombDevilSkillGoal
 			{
 				this.mob.setAnimationState(12);
 			}
-	    	AnimeShaderEffects.addEffect(this.mob.level, "Light", AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F), 10, 0);
 			this.skillWarmupDelay = this.adjustedTickDelay(this.getSkillWarmupTime());
 			this.count++;
 		}
@@ -78,7 +75,7 @@ public class BombDevilRapidFireGoal extends AbstractBombDevilSkillGoal
 	@Override
 	protected int getSkillUsingTime()
 	{
-		return 20;
+		return 60;
 	}
 	
 	@Override

@@ -15,6 +15,7 @@ import com.min01.minsanime.obj.Face;
 import com.min01.minsanime.obj.ObjAnimationDefinition;
 import com.min01.minsanime.obj.ObjAnimations;
 import com.min01.minsanime.obj.WavefrontObject;
+import com.min01.minsanime.shader.AnimeShaderEffects.ShaderEffect;
 import com.min01.minsanime.shader.AnimeShaders;
 import com.min01.minsanime.shader.ExtendedPostChain;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -42,7 +43,7 @@ public class AnimeClientUtil
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 	public static final Matrix4f INVERSE_MAT = new Matrix4f();
 	
-    public static void applyLight(PoseStack mtx, float frameTime, float tickCount)
+    public static void applyLight(PoseStack mtx, float frameTime)
 	{
 		Minecraft minecraft = AnimeClientUtil.MC;
 
@@ -75,7 +76,7 @@ public class AnimeClientUtil
 		}
 	}
     
-	public static void applyColoredExplosion(PoseStack mtx, float frameTime, float tickCount, float scale, Vec3 color)
+	public static void applyColoredExplosion(PoseStack mtx, float frameTime, float tickCount, float scale, Vec3 color, ShaderEffect effect)
 	{
 		Minecraft minecraft = AnimeClientUtil.MC;
 
@@ -85,8 +86,7 @@ public class AnimeClientUtil
 		if(shader != null)
 		{
 			shader.safeGetUniform("iResolution").set(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
-			shader.setSampler("iChannel0", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/organic4.png")).getId());
-			shader.setSampler("iChannel1", () -> minecraft.getTextureManager().getTexture(new ResourceLocation(MinsAnime.MODID, "textures/misc/rgba_noise_medium.png")).getId());
+			shader.setSampler("ImageSampler", effect::getOrCreateVolumeTextureId);
 			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
 			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
 			shader.safeGetUniform("Scale").set(scale);

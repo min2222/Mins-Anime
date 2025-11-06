@@ -3,7 +3,6 @@ package com.min01.minsanime.entity.ai.goal;
 import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.living.EntityReze;
 import com.min01.minsanime.entity.projectile.EntityRezeBullet;
-import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.util.AnimeUtil;
 
 import net.minecraft.world.phys.Vec2;
@@ -20,13 +19,12 @@ public class BombDevilShootingGoal extends AbstractBombDevilSkillGoal
 	{
 		super.start();
 		this.mob.setAnimationState(2);
-    	AnimeShaderEffects.addEffect(this.mob.level, "Light", AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.yHeadRot), this.mob.getEyePosition(), 0, 0, 1.5F), 40, 0);
 	}
 	
 	@Override
 	public boolean canUse()
 	{
-		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) >= 12.0F && this.mob.getTarget().onGround() && this.mob.onGround();
+		return super.canUse() && this.mob.distanceTo(this.mob.getTarget()) >= 12.0F;
 	}
 	
 	@Override
