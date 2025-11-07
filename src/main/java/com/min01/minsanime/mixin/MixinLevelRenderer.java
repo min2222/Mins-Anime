@@ -10,10 +10,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.min01.minsanime.entity.IShaderEffect;
 import com.min01.minsanime.shader.AnimeShaderEffects;
+import com.min01.minsanime.shader.AnimeShaderEffects.ZoltraakEffect;
 import com.min01.minsanime.util.AnimeClientUtil;
 import com.min01.minsanime.util.AnimeUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
@@ -21,6 +23,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 @Mixin(value = LevelRenderer.class, priority = -10000)
@@ -43,7 +46,14 @@ public class MixinLevelRenderer
 			}
 			else if(t.name.equals("ColoredExplosion"))
 			{
-    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t.tickCount, t.scale, t.color, t);
+    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t);
+			}
+			else if(t instanceof ZoltraakEffect effect)
+			{
+				Vec2 rot = effect.rotation;
+				mtx.mulPose(Axis.YP.rotationDegrees(-rot.y));
+				mtx.mulPose(Axis.XP.rotationDegrees(-rot.x));
+    			AnimeClientUtil.applyZoltraak(mtx, frameTime, effect.tickCount, effect.endPos.subtract(camPos), effect.maxScale);
 			}
 			mtx.popPose();
 		});

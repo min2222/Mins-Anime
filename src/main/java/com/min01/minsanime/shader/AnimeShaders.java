@@ -18,6 +18,7 @@ public class AnimeShaders implements ResourceManagerReloadListener
 	protected static ExtendedPostChain BULLET;
 	protected static ExtendedPostChain LIGHT;
 	protected static ExtendedPostChain COLORED_EXPLOSION;
+	protected static ExtendedPostChain ZOLTRAAK;
 
 	@Override
 	public void onResourceManagerReload(ResourceManager manager)
@@ -39,6 +40,7 @@ public class AnimeShaders implements ResourceManagerReloadListener
 		BULLET = add(new ExtendedPostChain(MinsAnime.MODID, "bullet"));
 		LIGHT = add(new ExtendedPostChain(MinsAnime.MODID, "light"));
 		COLORED_EXPLOSION = add(new ExtendedPostChain(MinsAnime.MODID, "colored_explosion"));
+		ZOLTRAAK = add(new ExtendedPostChain(MinsAnime.MODID, "zoltraak"));
 	}
 
 	public void clear()
@@ -71,5 +73,10 @@ public class AnimeShaders implements ResourceManagerReloadListener
 	public static ExtendedPostChain getColoredExplosion() 
 	{
 		return COLORED_EXPLOSION;
+	}
+	
+	public static ExtendedPostChain getZoltraak() 
+	{
+		return ZOLTRAAK;
 	}
 }

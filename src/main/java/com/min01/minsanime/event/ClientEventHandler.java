@@ -10,11 +10,6 @@ import com.min01.minsanime.entity.model.ModelFrieren;
 import com.min01.minsanime.entity.model.ModelReze;
 import com.min01.minsanime.entity.model.ModelRezeBomb;
 import com.min01.minsanime.entity.model.ModelRezeMissile;
-import com.min01.minsanime.entity.renderer.AltairRenderer;
-import com.min01.minsanime.entity.renderer.AltairSabreRenderer;
-import com.min01.minsanime.entity.renderer.EsdeathRenderer;
-import com.min01.minsanime.entity.renderer.FrierenRenderer;
-import com.min01.minsanime.entity.renderer.IceRenderer;
 import com.min01.minsanime.entity.renderer.NoneRenderer;
 import com.min01.minsanime.entity.renderer.RezeBombRenderer;
 import com.min01.minsanime.entity.renderer.RezeBulletRenderer;
@@ -80,11 +75,11 @@ public class ClientEventHandler
     @SubscribeEvent
     public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event)
     {
-    	event.registerEntityRenderer(AnimeEntities.ALTAIR.get(), AltairRenderer::new);
+    	/*event.registerEntityRenderer(AnimeEntities.ALTAIR.get(), AltairRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.ALTAIR_SABRE.get(), AltairSabreRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.FRIEREN.get(), FrierenRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.ESDEATH.get(), EsdeathRenderer::new);
-    	event.registerEntityRenderer(AnimeEntities.ICE.get(), IceRenderer::new);
+    	event.registerEntityRenderer(AnimeEntities.ICE.get(), IceRenderer::new);*/
     	event.registerEntityRenderer(AnimeEntities.CAMERA_SHAKE.get(), NoneRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.REZE.get(), RezeRenderer::new);
     	event.registerEntityRenderer(AnimeEntities.REZE_BULLET.get(), RezeBulletRenderer::new);

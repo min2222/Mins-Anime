@@ -1,8 +1,5 @@
 package com.min01.minsanime.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -31,7 +28,6 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -42,6 +38,24 @@ public class AnimeClientUtil
 	
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 	public static final Matrix4f INVERSE_MAT = new Matrix4f();
+	
+    public static void applyZoltraak(PoseStack mtx, float frameTime, float tickCount, Vec3 endPos, float maxScale)
+	{
+		Minecraft minecraft = AnimeClientUtil.MC;
+
+		ExtendedPostChain shaderChain = AnimeShaders.getZoltraak();
+		EffectInstance shader = shaderChain.getMainShader();
+
+		if(shader != null)
+		{
+			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
+			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
+			shader.safeGetUniform("EndPos").set((float) endPos.x, (float) endPos.y, (float) endPos.z);
+			shader.safeGetUniform("MaxScale").set(maxScale);
+			shaderChain.process(frameTime);
+			minecraft.getMainRenderTarget().bindWrite(false);
+		}
+	}
 	
     public static void applyLight(PoseStack mtx, float frameTime)
 	{
@@ -76,7 +90,7 @@ public class AnimeClientUtil
 		}
 	}
     
-	public static void applyColoredExplosion(PoseStack mtx, float frameTime, float tickCount, float scale, Vec3 color, ShaderEffect effect)
+	public static void applyColoredExplosion(PoseStack mtx, float frameTime, ShaderEffect effect)
 	{
 		Minecraft minecraft = AnimeClientUtil.MC;
 
@@ -88,9 +102,9 @@ public class AnimeClientUtil
 			shader.safeGetUniform("iResolution").set(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
 			shader.setSampler("ImageSampler", effect::getOrCreateVolumeTextureId);
 			shader.safeGetUniform("InverseTransformMatrix").set(getInverseTransformMatrix(INVERSE_MAT, mtx.last().pose()));
-			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
-			shader.safeGetUniform("Scale").set(scale);
-			shader.safeGetUniform("Color").set((float) color.x, (float) color.y, (float) color.z);
+			shader.safeGetUniform("iTime").set(effect.tickCount / 20.0F);
+			shader.safeGetUniform("Scale").set(effect.scale);
+			shader.safeGetUniform("Color").set((float) effect.color.x, (float) effect.color.y, (float) effect.color.z);
 			shaderChain.process(frameTime);
 			minecraft.getMainRenderTarget().bindWrite(false);
 		}
@@ -172,191 +186,6 @@ public class AnimeClientUtil
 		head.yRot += Math.toRadians(netHeadYaw);
 		head.xRot += Math.toRadians(headPitch);
 	}
-    
-    public static void drawCurvedCylinder(PoseStack stack, VertexConsumer buffer, Vec3 start, Vec3 end, float radius, float curveHeight, int curveSteps, int circleSegments, float r, float g, float b, float a)
-    {
-        Matrix4f matrix = stack.last().pose();
-
-        Vec3 control = start.add(end).scale(0.1F).add(0, curveHeight / 2, 0);
-
-        List<Vec3> curvePoints = new ArrayList<>();
-        List<Vec3> tangents = new ArrayList<>();
-
-        for(int i = 0; i <= curveSteps; i++) 
-        {
-            float t = i / (float) curveSteps;
-
-            Vec3 p0 = start.lerp(control, t);
-            Vec3 p1 = control.lerp(end, t);
-            Vec3 point = p0.lerp(p1, t);
-            curvePoints.add(point);
-
-            float dt = 1.0F / curveSteps;
-            Vec3 tangent;
-            if(i == 0)
-            {
-                float t1 = t + dt;
-                Vec3 p0b = start.lerp(control, t1);
-                Vec3 p1b = control.lerp(end, t1);
-                Vec3 nextPoint = p0b.lerp(p1b, t1);
-                tangent = nextPoint.subtract(point).normalize();
-            }
-            else if(i == curveSteps)
-            {
-                float t0 = t - dt;
-                Vec3 p0b = start.lerp(control, t0);
-                Vec3 p1b = control.lerp(end, t0);
-                Vec3 prevPoint = p0b.lerp(p1b, t0);
-                tangent = point.subtract(prevPoint).normalize();
-            } 
-            else 
-            {
-                float t0 = t - dt;
-                float t1 = t + dt;
-                Vec3 p0a = start.lerp(control, t0);
-                Vec3 p1a = control.lerp(end, t0);
-                Vec3 prevPoint = p0a.lerp(p1a, t0);
-
-                Vec3 p0b = start.lerp(control, t1);
-                Vec3 p1b = control.lerp(end, t1);
-                Vec3 nextPoint = p0b.lerp(p1b, t1);
-
-                tangent = nextPoint.subtract(prevPoint).normalize();
-            }
-
-            tangents.add(tangent);
-        }
-
-        Vec3 startDir = curvePoints.get(1).subtract(curvePoints.get(0)).normalize();
-        drawHemisphereCap(buffer, matrix, curvePoints.get(0), startDir.scale(-1), radius, circleSegments, r, g, b, a);
-
-        List<Vec3> prevRing = null;
-
-        for(int i = 0; i < curvePoints.size(); i++) 
-        {
-            Vec3 center = curvePoints.get(i);
-            Vec3 tangent = tangents.get(i);
-
-            Vec3 arbitrary = Math.abs(tangent.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
-            Vec3 normal = tangent.cross(arbitrary).normalize();
-            Vec3 binormal = tangent.cross(normal).normalize();
-
-            List<Vec3> ring = new ArrayList<>();
-            for(int j = 0; j < circleSegments; j++) 
-            {
-                float angle = (float) (2 * Math.PI * j / circleSegments);
-                Vec3 offset = normal.scale(Math.cos(angle) * radius).add(binormal.scale(Math.sin(angle) * radius));
-                ring.add(center.add(offset));
-            }
-
-            if(prevRing != null) 
-            {
-                for(int j = 0; j < circleSegments; j++)
-                {
-                    Vec3 v0 = prevRing.get(j);
-                    Vec3 v1 = prevRing.get((j + 1) % circleSegments);
-                    Vec3 v2 = ring.get((j + 1) % circleSegments);
-                    Vec3 v3 = ring.get(j);
-
-                    vertex(buffer, matrix, v0, r, g, b, a);
-                    vertex(buffer, matrix, v1, r, g, b, a);
-                    vertex(buffer, matrix, v2, r, g, b, a);
-
-                    vertex(buffer, matrix, v2, r, g, b, a);
-                    vertex(buffer, matrix, v3, r, g, b, a);
-                    vertex(buffer, matrix, v0, r, g, b, a);
-                }
-            }
-
-            prevRing = ring;
-        }
-
-        Vec3 endDir = curvePoints.get(curvePoints.size() - 1).subtract(curvePoints.get(curvePoints.size() - 2)).normalize();
-        drawHemisphereCap(buffer, matrix, curvePoints.get(curvePoints.size() - 1), endDir, radius, circleSegments, r, g, b, a);
-    }
-
-    public static void drawHemisphereCap(VertexConsumer buffer, Matrix4f matrix, Vec3 center, Vec3 direction, float radius, int segments, float r, float g, float b, float a)
-    {
-        Vec3 arbitrary = Math.abs(direction.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
-        Vec3 normal = direction.cross(arbitrary).normalize();
-        Vec3 binormal = direction.cross(normal).normalize();
-
-        int rings = segments / 2;
-
-        for(int i = 0; i < rings; i++) 
-        {
-            float theta1 = (float) (Math.PI / 2 * i / rings);
-            float theta2 = (float) (Math.PI / 2 * (i + 1) / rings);
-
-            float y1 = (float) Math.sin(theta1);
-            float y2 = (float) Math.sin(theta2);
-            float r1 = (float) Math.cos(theta1);
-            float r2 = (float) Math.cos(theta2);
-
-            for(int j = 0; j < segments; j++) 
-            {
-                float phi1 = (float) (2 * Math.PI * j / segments);
-                float phi2 = (float) (2 * Math.PI * (j + 1) / segments);
-
-                Vec3 v00 = direction.scale(y1 * radius).add(normal.scale(r1 * radius * Math.cos(phi1)).add(binormal.scale(r1 * radius * Math.sin(phi1))));
-                Vec3 v01 = direction.scale(y1 * radius).add(normal.scale(r1 * radius * Math.cos(phi2)).add(binormal.scale(r1 * radius * Math.sin(phi2))));
-                Vec3 v10 = direction.scale(y2 * radius).add(normal.scale(r2 * radius * Math.cos(phi1)).add(binormal.scale(r2 * radius * Math.sin(phi1))));
-                Vec3 v11 = direction.scale(y2 * radius).add(normal.scale(r2 * radius * Math.cos(phi2)).add(binormal.scale(r2 * radius * Math.sin(phi2))));
-
-                v00 = v00.add(center);
-                v01 = v01.add(center);
-                v10 = v10.add(center);
-                v11 = v11.add(center);
-
-                vertex(buffer, matrix, v00, r, g, b, a);
-                vertex(buffer, matrix, v01, r, g, b, a);
-                vertex(buffer, matrix, v11, r, g, b, a);
-
-                vertex(buffer, matrix, v11, r, g, b, a);
-                vertex(buffer, matrix, v10, r, g, b, a);
-                vertex(buffer, matrix, v00, r, g, b, a);
-            }
-        }
-    }
-    
-    public static void vertex(VertexConsumer buffer, Matrix4f matrix, Vec3 pos, float r, float g, float b, float a)
-    {
-    	buffer.vertex(matrix, (float) pos.x, (float) pos.y, (float) pos.z).color(r, g, b, a).uv(0, 0).endVertex();
-    }
-    
-    public static void drawCylinder(PoseStack stack, VertexConsumer buffer, float radius, float height, int segments, float r, float g, float b, float a)
-    {
-		Matrix4f matrix = stack.last().pose();
-		float halfHeight = height / 2;
-		
-		for(int i = 0; i <= segments; i++) 
-		{
-			float angle = (float) (2 * Math.PI * i / segments);
-			float x = radius * Mth.cos(angle);
-			float z = radius * Mth.sin(angle);
-			
-			buffer.vertex(matrix, x, halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
-			buffer.vertex(matrix, x, -halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
-		}
-		
-		buffer.vertex(matrix, 0, halfHeight, 0).color(r, g, b, a).uv(0, 0).endVertex();
-		for(int i = 0; i <= segments; i++)
-		{
-			float angle = (float) (2 * Math.PI * i / segments);
-			float x = radius * Mth.cos(angle);
-			float z = radius * Mth.sin(angle);
-			buffer.vertex(matrix, x, halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
-		}
-		
-		buffer.vertex(matrix, 0, -halfHeight, 0).color(r, g, b, a).uv(0, 0).endVertex();
-		for(int i = 0; i <= segments; i++)
-		{
-			float angle = (float) (2 * Math.PI * i / segments);
-			float x = radius * Mth.cos(angle);
-			float z = radius * Mth.sin(angle);
-			buffer.vertex(matrix, x, -halfHeight, z).color(r, g, b, a).uv(0, 0).endVertex();
-		}
-    }
     
     public static void drawQuad(PoseStack stack, VertexConsumer consumer, float size, int packedLightIn, float alpha) 
     {

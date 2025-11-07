@@ -1,13 +1,7 @@
 package com.min01.minsanime.entity.ai.goal;
 
-import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.living.EntityAltair;
-import com.min01.minsanime.entity.projectile.EntityAltairSabre;
 import com.min01.minsanime.entity.projectile.EntityAltairSabre.SabreAttackType;
-import com.min01.minsanime.util.AnimeUtil;
-
-import net.minecraft.commands.arguments.EntityAnchorArgument.Anchor;
-import net.minecraft.world.phys.Vec3;
 
 public class AltairSabreAttackGoal extends AbstractAltairSkillGoal
 {
@@ -27,7 +21,7 @@ public class AltairSabreAttackGoal extends AbstractAltairSkillGoal
 	@Override
 	protected void performSkill() 
 	{
-		switch(this.type)
+		/*switch(this.type)
 		{
 		case CIRCLE:
 			for(float i = 0.0F; i < 360.0F; i += 360.0F / this.mob.getSabreCount())
@@ -68,7 +62,7 @@ public class AltairSabreAttackGoal extends AbstractAltairSkillGoal
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 	
 	@Override

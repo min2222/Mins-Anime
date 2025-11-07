@@ -1,12 +1,6 @@
 package com.min01.minsanime.entity.ai.goal;
 
-import com.min01.minsanime.entity.AnimeEntities;
 import com.min01.minsanime.entity.living.EntityEsdeath;
-import com.min01.minsanime.entity.projectile.EntityIce;
-import com.min01.minsanime.util.AnimeUtil;
-
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 
 public class EsdeathIceWallGoal extends BasicAnimationSkillGoal<EntityEsdeath>
 {
@@ -31,7 +25,7 @@ public class EsdeathIceWallGoal extends BasicAnimationSkillGoal<EntityEsdeath>
 	@Override
 	protected void performSkill()
 	{
-		int dist = (int) Math.floor(this.mob.distanceTo(this.mob.getTarget()) / 5.0F);
+		/*int dist = (int) Math.floor(this.mob.distanceTo(this.mob.getTarget()) / 5.0F);
 		for(int i = 0; i < dist; i++)
 		{
 			int index = i + 1;
@@ -47,7 +41,7 @@ public class EsdeathIceWallGoal extends BasicAnimationSkillGoal<EntityEsdeath>
 			ice.setCameraShake(true);
 			ice.setXRot(this.mob.getXRot() + 10.0F);
 			this.mob.level.addFreshEntity(ice);
-		}
+		}*/
 	}
 	
 	@Override

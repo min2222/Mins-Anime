@@ -3,7 +3,6 @@ package com.min01.minsanime.entity.living;
 import java.util.List;
 
 import com.min01.minsanime.entity.AbstractAnimatableMonster;
-import com.min01.minsanime.entity.ai.goal.EsdeathIceBarrierGoal;
 import com.min01.minsanime.entity.ai.goal.EsdeathIceWallGoal;
 import com.min01.minsanime.misc.SmoothAnimationState;
 import com.min01.minsanime.util.AnimeUtil;
@@ -44,7 +43,6 @@ public class EntityEsdeath extends AbstractAnimatableMonster
     {
     	super.registerGoals();
     	this.goalSelector.addGoal(0, new EsdeathIceWallGoal(this));
-    	this.goalSelector.addGoal(0, new EsdeathIceBarrierGoal(this));
     	this.targetSelector.addGoal(4, new HurtByTargetGoal(this));
     	this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, LivingEntity.class, false));
     }

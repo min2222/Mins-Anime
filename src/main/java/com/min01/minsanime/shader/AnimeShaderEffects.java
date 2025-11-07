@@ -10,12 +10,14 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL30;
 
 import com.min01.minsanime.network.AddShaderEffectPacket;
+import com.min01.minsanime.network.AddZoltraakEffectPacket;
 import com.min01.minsanime.network.AnimeNetwork;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimeShaderEffects 
@@ -27,11 +29,34 @@ public class AnimeShaderEffects
 		addEffect(level, name, pos, lifeTime, scale, Vec3.ZERO);
 	}
 	
+	public static void addZoltraak(Level level, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation)
+	{
+		if(!level.isClientSide)
+		{
+			AnimeNetwork.sendToAll(new AddZoltraakEffectPacket("Zoltraak", pos, endPos, lifeTime, maxScale, rotation));
+		}
+	}
+	
 	public static void addEffect(Level level, String name, Vec3 pos, int lifeTime, float scale, Vec3 color)
 	{
 		if(!level.isClientSide)
 		{
 			AnimeNetwork.sendToAll(new AddShaderEffectPacket(name, pos, lifeTime, scale, color));
+		}
+	}
+	
+	public static class ZoltraakEffect extends ShaderEffect
+	{
+		public final Vec3 endPos;
+		public final float maxScale;
+		public final Vec2 rotation;
+		
+		public ZoltraakEffect(String name, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation) 
+		{
+			super(name, pos, lifeTime, 0.0F, Vec3.ZERO);
+			this.endPos = endPos;
+			this.maxScale = maxScale;
+			this.rotation = rotation;
 		}
 	}
 	

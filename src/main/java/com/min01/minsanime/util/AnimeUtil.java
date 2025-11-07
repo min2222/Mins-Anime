@@ -1,7 +1,6 @@
 package com.min01.minsanime.util;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -10,7 +9,6 @@ import org.joml.Math;
 import com.min01.minsanime.capabilities.AnimeCapabilities;
 import com.min01.minsanime.capabilities.IOwnerCapability;
 import com.min01.minsanime.capabilities.OwnerCapabilityImpl;
-import com.min01.minsanime.entity.ai.goal.EsdeathIceBarrierGoal;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -19,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.LevelEntityGetter;
@@ -78,13 +75,13 @@ public class AnimeUtil
     
     public static void setDirection(PathfinderMob entity, Vec3 arrowDirection) 
     {
-        for(WrappedGoal task : new ArrayList<>(entity.goalSelector.getAvailableGoals())) 
+    	/*for(WrappedGoal task : new ArrayList<>(entity.goalSelector.getAvailableGoals())) 
         {
             if(task.getGoal() instanceof EsdeathIceBarrierGoal goal) 
             {
                 goal.setDirection(arrowDirection);
             }
-        }
+        }*/
     }
 	
     @SuppressWarnings("deprecation")

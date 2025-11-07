@@ -21,7 +21,7 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 	{
 		super.start();
 		this.mob.setAnimationState(1);
-		this.type = LaserType.getRandom(this.mob.getRandom());
+		this.type = LaserType.SINGLE;
 	}
 
 	@Override
@@ -29,19 +29,10 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 	{
 		if(this.mob.getTarget() != null)
 		{
-			if(this.type == LaserType.SINGLE)
+			if(this.type != LaserType.RAPID)
 			{
 				Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
-				this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
-			}
-			if(this.type == LaserType.MULTI)
-			{
-				
-			}
-			if(this.type == LaserType.BIG)
-			{
-				Vec3 pos = AnimeUtil.getLookPos(new Vec2(this.mob.getXRot(), this.mob.getYHeadRot()), this.mob.getEyePosition(), 0.0F, 0.0F, 1.5F);
-				this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
+				this.mob.castZoltraak(pos, this.mob.getTarget().getEyePosition(), AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.type);
 			}
 		}
 	}
@@ -55,7 +46,7 @@ public class FrierenZoltraakGoal extends BasicAnimationSkillGoal<EntityFrieren>
 			if(this.mob.getAnimationTick() % 2 == 0 && this.mob.getTarget() != null)
 			{
 				Vec3 pos = AnimeUtil.getSpreadPosition(this.mob.level, this.mob.getEyePosition(), new Vec3(4, 2, 4));
-				this.mob.castZoltraak(pos, AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.mob.getTarget(), this.type);
+				this.mob.castZoltraak(pos, this.mob.getTarget().getEyePosition(), AnimeUtil.lookAt(this.mob.getEyePosition(), this.mob.getTarget().getEyePosition()), this.type);
 			}
 		}
 	}
