@@ -27,7 +27,6 @@ public class ModelReze extends HierarchicalModel<EntityReze>
 	private final ModelPart head;
 	private final ModelPart left_arm;
 	private final ModelPart right_arm;
-	private final ModelPart pin;
 	private final ModelPart left_leg;
 	private final ModelPart right_leg;
 
@@ -38,7 +37,6 @@ public class ModelReze extends HierarchicalModel<EntityReze>
 		this.head = this.body.getChild("head");
 		this.left_arm = this.body.getChild("left_arm");
 		this.right_arm = this.body.getChild("right_arm");
-		this.pin = this.right_arm.getChild("pin");
 		this.left_leg = this.root.getChild("left_leg");
 		this.right_leg = this.root.getChild("right_leg");
 	}
@@ -58,11 +56,7 @@ public class ModelReze extends HierarchicalModel<EntityReze>
 
 		body.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(32, 48).addBox(-1.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(5.0F, 2.0F, 0.0F));
 
-		PartDefinition right_arm = body.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(40, 16).addBox(-2.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
-
-		PartDefinition pin = right_arm.addOrReplaceChild("pin", CubeListBuilder.create().texOffs(55, 56).addBox(-0.5F, 0.0F, 0.0F, 1.0F, 8.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(3.5F, -2.0F, -1.9F));
-
-		pin.addOrReplaceChild("ring", CubeListBuilder.create().texOffs(58, 57).addBox(-1.5F, 0.0F, 0.0F, 2.0F, 2.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 8.0F, 0.0F));
+		body.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(40, 16).addBox(-2.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
 
 		root.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
 		.texOffs(0, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(2.0F, -12.0F, 0.0F));
@@ -80,8 +74,6 @@ public class ModelReze extends HierarchicalModel<EntityReze>
 		AnimeClientUtil.animateHead(this.head, netHeadYaw, headPitch);
 		
 		entity.transformAnimationState.animate(this, RezeAnimation.REZE_TRANSFORM, ageInTicks);
-		
-		this.pin.visible = entity.getAnimationState() == 1;
 		
 		if(!entity.isUsingSkill())
 		{
