@@ -17,6 +17,7 @@
 		{ "name": "OutSize", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
 		{ "name": "MaxScale", "type": "float", "count": 1, "values": [ 1.0 ] },
 		{ "name": "EndPos", "type": "float", "count": 3, "values": [ 1.0, 1.0, 1.0 ] },
+		{ "name": "Rotation", "type": "float", "count": 2, "values": [ 0.0, 0.0 ] },
 		{ "name": "iTime", "type": "float", "count": 1, "values": [ 1.0 ] }
 	]
 }

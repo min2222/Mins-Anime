@@ -10,6 +10,7 @@ import com.mojang.math.Axis;
 
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +41,12 @@ public class FrierenRenderer extends MobRenderer<EntityFrieren, ModelFrieren>
 			
 			p_115458_.popPose();
 		}
+	}
+	
+	@Override
+	protected RenderType getRenderType(EntityFrieren p_115322_, boolean p_115323_, boolean p_115324_, boolean p_115325_) 
+	{
+		return AnimeRenderType.entityPixel(this.getTextureLocation(p_115322_));
 	}
 
 	@Override

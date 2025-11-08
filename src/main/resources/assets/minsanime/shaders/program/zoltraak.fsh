@@ -7,6 +7,7 @@ uniform float iTime;
 
 uniform float MaxScale;
 uniform vec3 EndPos;
+uniform vec2 Rotation;
 
 in vec2 texCoord;
 in vec4 near_4;

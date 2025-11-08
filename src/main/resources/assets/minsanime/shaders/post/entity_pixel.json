@@ -1,0 +1,28 @@
+{
+    "targets": [
+        "swap",
+        "final"
+    ],
+    "passes": [
+        {
+            "name": "minsanime:entity_pixel",
+            "intarget": "final",
+            "outtarget": "swap",
+			"auxtargets": [
+				{
+					"name": "DepthSampler",
+					"id": "minecraft:main:depth"
+				},
+				{
+					"name": "SceneSampler",
+					"id": "minecraft:main"
+				}
+			]
+        },
+        {
+            "name": "blit",
+            "intarget": "swap",
+            "outtarget": "final"
+        }
+    ]
+}

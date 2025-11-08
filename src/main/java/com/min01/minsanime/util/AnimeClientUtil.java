@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 public class AnimeClientUtil 
@@ -39,7 +40,7 @@ public class AnimeClientUtil
 	public static final Vector3f ANIMATION_VECTOR_CACHE = new Vector3f();
 	public static final Matrix4f INVERSE_MAT = new Matrix4f();
 	
-    public static void applyZoltraak(PoseStack mtx, float frameTime, float tickCount, Vec3 endPos, float maxScale)
+    public static void applyZoltraak(PoseStack mtx, float frameTime, float tickCount, Vec3 endPos, float maxScale, Vec2 rotation)
 	{
 		Minecraft minecraft = AnimeClientUtil.MC;
 
@@ -52,6 +53,7 @@ public class AnimeClientUtil
 			shader.safeGetUniform("iTime").set(tickCount / 20.0F);
 			shader.safeGetUniform("EndPos").set((float) endPos.x, (float) endPos.y, (float) endPos.z);
 			shader.safeGetUniform("MaxScale").set(maxScale);
+			shader.safeGetUniform("Rotation").set(rotation.x, rotation.y);
 			shaderChain.process(frameTime);
 			minecraft.getMainRenderTarget().bindWrite(false);
 		}

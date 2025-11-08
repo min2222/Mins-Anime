@@ -1,6 +1,9 @@
 package com.min01.minsanime.misc;
 
 import com.min01.minsanime.obj.WavefrontObject;
+import com.min01.minsanime.shader.AnimeEntityEffects;
+import com.min01.minsanime.util.AnimeClientUtil;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
@@ -11,10 +14,30 @@ import net.minecraft.resources.ResourceLocation;
 
 public class AnimeRenderType extends RenderType
 {
+	public static final RenderStateShard.OutputStateShard PIXEL_OUTPUT = new RenderStateShard.OutputStateShard("pixel_target", () -> 
+    {
+        RenderTarget target = AnimeEntityEffects.ENTITY_PIXEL.entityTarget;
+        if(target != null) 
+        {
+            target.copyDepthFrom(AnimeClientUtil.MC.getMainRenderTarget());
+            target.bindWrite(false);
+        }
+    }, 
+    () ->
+    {
+        AnimeClientUtil.MC.getMainRenderTarget().bindWrite(false);
+    });
+    
 	public AnimeRenderType(String p_173178_, VertexFormat p_173179_, Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_)
 	{
 		super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
 	}
+	
+    public static RenderType entityPixel(ResourceLocation texture)
+    {
+        RenderType.CompositeState state = RenderType.CompositeState.builder().setShaderState(RENDERTYPE_ENTITY_CUTOUT_NO_CULL_SHADER).setTextureState(new RenderStateShard.TextureStateShard(texture, false, false)).setTransparencyState(NO_TRANSPARENCY).setCullState(NO_CULL).setLightmapState(LIGHTMAP).setOverlayState(OVERLAY).setOutputState(PIXEL_OUTPUT).createCompositeState(true);
+        return create("entity_pixel", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 256, true, false, state);
+    }
     
     public static RenderType objBlend(ResourceLocation texture)
     {
