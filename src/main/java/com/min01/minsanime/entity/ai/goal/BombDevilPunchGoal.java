@@ -40,13 +40,14 @@ public class BombDevilPunchGoal extends AbstractBombDevilSkillGoal
 	{
 		super.stop();
 		this.mob.setAnimationState(0);
-		if(this.mob.getRandom().nextBoolean())
+		if(Math.random() <= 0.8F)
 		{
 			this.mob.goal = BombDevilJumpGoal.class;
 		}
 		else
 		{
 			this.mob.goal = BombDevilRainbowExplosionGoal.class;
+	    	this.nextSkillTickCount = this.mob.tickCount + 200;
 		}
 	}
 
