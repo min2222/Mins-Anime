@@ -16,6 +16,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -33,7 +34,7 @@ public class AnimeShaderEffects
 	{
 		if(!level.isClientSide)
 		{
-			AnimeNetwork.sendToAll(new AddZoltraakEffectPacket("Zoltraak", pos, endPos, lifeTime, maxScale, rotation));
+			AnimeNetwork.sendToAll(new AddZoltraakEffectPacket(level.dimension(), "Zoltraak", pos, endPos, lifeTime, maxScale, rotation));
 		}
 	}
 	
@@ -41,7 +42,7 @@ public class AnimeShaderEffects
 	{
 		if(!level.isClientSide)
 		{
-			AnimeNetwork.sendToAll(new AddShaderEffectPacket(name, pos, lifeTime, scale, color));
+			AnimeNetwork.sendToAll(new AddShaderEffectPacket(level.dimension(), name, pos, lifeTime, scale, color));
 		}
 	}
 	
@@ -51,9 +52,9 @@ public class AnimeShaderEffects
 		public final float maxScale;
 		public final Vec2 rotation;
 		
-		public ZoltraakEffect(String name, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation) 
+		public ZoltraakEffect(ResourceKey<Level> dimension, String name, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation) 
 		{
-			super(name, pos, lifeTime, 0.0F, Vec3.ZERO);
+			super(dimension, name, pos, lifeTime, 0.0F, Vec3.ZERO);
 			this.endPos = endPos;
 			this.maxScale = maxScale;
 			this.rotation = rotation;
@@ -62,6 +63,7 @@ public class AnimeShaderEffects
 	
 	public static class ShaderEffect
 	{
+		public final ResourceKey<Level> dimension;
 		public final String name;
 		public final Vec3 pos;
 		public final int lifeTime;
@@ -74,13 +76,14 @@ public class AnimeShaderEffects
 	    private static final int VOLUME_HEIGHT = 32;
 	    private static final int VOLUME_DEPTH = 32;
 		
-		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale)
+		public ShaderEffect(ResourceKey<Level> dimension, String name, Vec3 pos, int lifeTime, float scale)
 		{
-			this(name, pos, lifeTime, scale, Vec3.ZERO);
+			this(dimension, name, pos, lifeTime, scale, Vec3.ZERO);
 		}
 		
-		public ShaderEffect(String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
+		public ShaderEffect(ResourceKey<Level> dimension, String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
 		{
+			this.dimension = dimension;
 			this.name = name;
 			this.pos = pos;
 			this.lifeTime = lifeTime;

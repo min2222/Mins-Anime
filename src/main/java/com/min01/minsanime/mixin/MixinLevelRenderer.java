@@ -32,7 +32,7 @@ public class MixinLevelRenderer
     @Inject(method = "Lnet/minecraft/client/renderer/LevelRenderer;initOutline()V", at = @At("TAIL"))
     private void initOutline(CallbackInfo ci)
     {
-       AnimeEntityEffects.ENTITY_PIXEL.initEffect();
+    	AnimeEntityEffects.ENTITY_PIXEL.initEffect();
     }
     
     @Inject(method = "Lnet/minecraft/client/renderer/LevelRenderer;resize(II)V", at = @At("TAIL"))
@@ -73,24 +73,27 @@ public class MixinLevelRenderer
 		RenderSystem.depthMask(false);
 		new ArrayList<>(AnimeShaderEffects.EFFECTS).forEach(t -> 
 		{
-			Vec3 worldPos = t.pos;
-			Vec3 camPos = camera.getPosition();
-			Vec3 pos = worldPos.subtract(camPos);
-			mtx.pushPose();
-			mtx.translate(pos.x, pos.y, pos.z);
-			if(t.name.equals("Explosion"))
+			if(AnimeClientUtil.MC.level.dimension() == t.dimension)
 			{
-    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+				Vec3 worldPos = t.pos;
+				Vec3 camPos = camera.getPosition();
+				Vec3 pos = worldPos.subtract(camPos);
+				mtx.pushPose();
+				mtx.translate(pos.x, pos.y, pos.z);
+				if(t.name.equals("Explosion"))
+				{
+	    			AnimeClientUtil.applyExplosion(mtx, frameTime, t.tickCount, t.scale);
+				}
+				else if(t.name.equals("ColoredExplosion"))
+				{
+	    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t);
+				}
+				else if(t instanceof ZoltraakEffect effect)
+				{
+	    			AnimeClientUtil.applyZoltraak(mtx, frameTime, effect.tickCount, effect.endPos.subtract(camPos), effect.maxScale, effect.rotation);
+				}
+				mtx.popPose();
 			}
-			else if(t.name.equals("ColoredExplosion"))
-			{
-    			AnimeClientUtil.applyColoredExplosion(mtx, frameTime, t);
-			}
-			else if(t instanceof ZoltraakEffect effect)
-			{
-    			AnimeClientUtil.applyZoltraak(mtx, frameTime, effect.tickCount, effect.endPos.subtract(camPos), effect.maxScale, effect.rotation);
-			}
-			mtx.popPose();
 		});
 		for(Entity entity : AnimeUtil.getAllEntities(AnimeClientUtil.MC.level))
 		{

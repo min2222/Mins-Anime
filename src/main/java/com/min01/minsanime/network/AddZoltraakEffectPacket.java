@@ -6,13 +6,17 @@ import com.min01.minsanime.misc.AnimeEntityDataSerializers;
 import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.shader.AnimeShaderEffects.ZoltraakEffect;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 public class AddZoltraakEffectPacket 
 {
+	private final ResourceKey<Level> dimension;
 	private final String name;
 	private final Vec3 pos;
 	private final Vec3 endPos;
@@ -20,8 +24,9 @@ public class AddZoltraakEffectPacket
 	private final float maxScale;
 	private final Vec2 rotation;
 
-	public AddZoltraakEffectPacket(String name, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation) 
+	public AddZoltraakEffectPacket(ResourceKey<Level> dimension, String name, Vec3 pos, Vec3 endPos, int lifeTime, float maxScale, Vec2 rotation) 
 	{
+		this.dimension = dimension;
 		this.name = name;
 		this.pos = pos;
 		this.endPos = endPos;
@@ -32,6 +37,7 @@ public class AddZoltraakEffectPacket
 
 	public AddZoltraakEffectPacket(FriendlyByteBuf buf)
 	{
+		this.dimension = buf.readResourceKey(Registries.DIMENSION);
 		this.name = buf.readUtf();
 		this.pos = AnimeEntityDataSerializers.readVec3(buf);
 		this.endPos = AnimeEntityDataSerializers.readVec3(buf);
@@ -42,6 +48,7 @@ public class AddZoltraakEffectPacket
 
 	public void encode(FriendlyByteBuf buf)
 	{
+		buf.writeResourceKey(this.dimension);
 		buf.writeUtf(this.name);
 		AnimeEntityDataSerializers.writeVec3(buf, this.pos);
 		AnimeEntityDataSerializers.writeVec3(buf, this.endPos);
@@ -58,7 +65,7 @@ public class AddZoltraakEffectPacket
 			{
 				if(ctx.get().getDirection().getReceptionSide().isClient())
 				{
-					AnimeShaderEffects.EFFECTS.add(new ZoltraakEffect(message.name, message.pos, message.endPos, message.lifeTime, message.maxScale, message.rotation));
+					AnimeShaderEffects.EFFECTS.add(new ZoltraakEffect(message.dimension, message.name, message.pos, message.endPos, message.lifeTime, message.maxScale, message.rotation));
 				}
 			});
 			ctx.get().setPacketHandled(true);

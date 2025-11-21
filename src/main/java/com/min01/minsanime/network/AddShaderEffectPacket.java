@@ -6,20 +6,25 @@ import com.min01.minsanime.misc.AnimeEntityDataSerializers;
 import com.min01.minsanime.shader.AnimeShaderEffects;
 import com.min01.minsanime.shader.AnimeShaderEffects.ShaderEffect;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 public class AddShaderEffectPacket 
 {
+	private final ResourceKey<Level> dimension;
 	private final String name;
 	private final Vec3 pos;
 	private final int lifeTime;
 	private final float scale;
 	private final Vec3 color;
 
-	public AddShaderEffectPacket(String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
+	public AddShaderEffectPacket(ResourceKey<Level> dimension, String name, Vec3 pos, int lifeTime, float scale, Vec3 color) 
 	{
+		this.dimension = dimension;
 		this.name = name;
 		this.pos = pos;
 		this.lifeTime = lifeTime;
@@ -29,6 +34,7 @@ public class AddShaderEffectPacket
 
 	public AddShaderEffectPacket(FriendlyByteBuf buf)
 	{
+		this.dimension = buf.readResourceKey(Registries.DIMENSION);
 		this.name = buf.readUtf();
 		this.pos = AnimeEntityDataSerializers.readVec3(buf);
 		this.lifeTime = buf.readInt();
@@ -38,6 +44,7 @@ public class AddShaderEffectPacket
 
 	public void encode(FriendlyByteBuf buf)
 	{
+		buf.writeResourceKey(this.dimension);
 		buf.writeUtf(this.name);
 		AnimeEntityDataSerializers.writeVec3(buf, this.pos);
 		buf.writeInt(this.lifeTime);
@@ -53,7 +60,7 @@ public class AddShaderEffectPacket
 			{
 				if(ctx.get().getDirection().getReceptionSide().isClient())
 				{
-					AnimeShaderEffects.EFFECTS.add(new ShaderEffect(message.name, message.pos, message.lifeTime, message.scale, message.color));
+					AnimeShaderEffects.EFFECTS.add(new ShaderEffect(message.dimension, message.name, message.pos, message.lifeTime, message.scale, message.color));
 				}
 			});
 			ctx.get().setPacketHandled(true);
